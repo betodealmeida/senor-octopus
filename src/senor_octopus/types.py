@@ -9,7 +9,7 @@ from typing_extensions import TypedDict
 class Event(TypedDict):
     timestamp: datetime
     name: str
-    value: float
+    value: Any
 
 
 Stream = Iterator[Event]

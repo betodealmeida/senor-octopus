@@ -3,6 +3,7 @@ import os
 
 import psycopg2
 from psycopg2 import sql
+from psycopg2.extras import Json
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ def postgresql(stream: Stream, table: str = "events") -> None:
                         CREATE TABLE IF NOT EXISTS {} (
                             "timestamp" TIMESTAMP,
                             "name" VARCHAR,
-                            "value" NUMERIC
+                            "value" JSON
                         );
                     """,
                 ).format(sql.Identifier(table)),
@@ -43,5 +44,5 @@ def postgresql(stream: Stream, table: str = "events") -> None:
                             VALUES (%s, %s, %s);
                         """,
                     ).format(sql.Identifier(table)),
-                    (event["timestamp"], event["name"], event["value"]),
+                    (event["timestamp"], event["name"], Json(event["value"])),
                 )

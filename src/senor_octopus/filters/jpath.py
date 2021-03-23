@@ -2,8 +2,10 @@ from jsonpath import JSONPath
 from senor_octopus.types import Stream
 
 
-def jsonpath(stream: Stream, filter: str) -> Stream:
+async def jsonpath(stream: Stream, filter: str) -> Stream:
     """
     Filter event stream based on a JSON path.
     """
-    yield from JSONPath(filter).parse({"events": list(stream)})
+    events = [event async for event in stream]
+    for event in JSONPath(filter).parse({"events": events}):
+        yield event

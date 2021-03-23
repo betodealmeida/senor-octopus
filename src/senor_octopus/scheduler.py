@@ -1,5 +1,5 @@
+import asyncio
 import logging
-import time
 from collections import defaultdict
 from typing import Dict
 from typing import Set
@@ -13,7 +13,7 @@ class Scheduler:
     def __init__(self, dag: Set[Source]):
         self.dag = dag
 
-    def run(self) -> None:
+    async def run(self) -> None:
         _logger.info("Starting scheduler...")
 
         while True:
@@ -23,7 +23,5 @@ class Scheduler:
                     delays[node.schedule.next(default_utc=True)].add(node)
             min_delay = min(delays)
             _logger.info(f"Sleeping for {min_delay} seconds...")
-            time.sleep(min_delay)
-
-            for node in delays[min_delay]:
-                node.run()
+            await asyncio.sleep(min_delay)
+            await asyncio.gather(*[node.run() for node in delays[min_delay]])

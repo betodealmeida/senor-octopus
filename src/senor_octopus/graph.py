@@ -1,5 +1,4 @@
 import configparser
-import itertools
 import os
 import re
 from datetime import datetime
@@ -13,6 +12,7 @@ from typing import Set
 from typing import Tuple
 from typing import Union
 
+from asyncstdlib import itertools
 from crontab import CronTab
 from durations import Duration
 from pkg_resources import iter_entry_points
@@ -78,13 +78,11 @@ class Source(Node):
         self.schedule = CronTab(schedule) if schedule else None
         self.extra_kwargs = extra_kwargs
 
-    def run(self) -> None:
+    async def run(self) -> None:
         stream = self.plugin(**self.extra_kwargs)
-        n = len(self.next)
-        streams = [stream] if n == 1 else itertools.tee(stream, n)
-
-        for downstream_node, stream in zip(self.next, streams):
-            downstream_node.run(stream)
+        async with itertools.tee(stream, n=len(self.next)) as streams:
+            for node, stream in zip(self.next, streams):
+                await node.run(stream)
 
 
 class Filter(Node):
@@ -93,13 +91,11 @@ class Filter(Node):
         self.plugin = plugin
         self.extra_kwargs = extra_kwargs
 
-    def run(self, stream: Stream) -> None:
+    async def run(self, stream: Stream) -> None:
         stream = self.plugin(stream, **self.extra_kwargs)
-        n = len(self.next)
-        streams = [stream] if n == 1 else itertools.tee(stream, n)
-
-        for downstream_node, stream in zip(self.next, streams):
-            downstream_node.run(stream)
+        async with itertools.tee(stream, n=len(self.next)) as streams:
+            for node, stream in zip(self.next, streams):
+                await node.run(stream)
 
 
 class Sink(Node):
@@ -122,7 +118,7 @@ class Sink(Node):
         self.last_run: Optional[datetime] = None
         self.buffer: List[Event] = []
 
-    def run(self, stream: Stream) -> None:
+    async def run(self, stream: Stream) -> None:
         if (
             self.last_run is not None
             and self.throttle
@@ -130,7 +126,7 @@ class Sink(Node):
         ):
             return
 
-        self.plugin(stream, **self.extra_kwargs)
+        await self.plugin(stream, **self.extra_kwargs)  # type: ignore
         self.last_run = datetime.now()
 
 

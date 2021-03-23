@@ -1,6 +1,6 @@
 import pytest
-
-from senor_octopus.skeleton import fib, main
+from senor_octopus.skeleton import fib
+from senor_octopus.skeleton import main
 
 __author__ = "Beto Dealmeida"
 __copyright__ = "Beto Dealmeida"

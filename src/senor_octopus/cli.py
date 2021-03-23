@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 import configparser
 import logging
 import sys
@@ -70,7 +71,7 @@ class CaseConfigParser(configparser.RawConfigParser):
         return optionstr
 
 
-def main(args):
+async def main(args):
     args = parse_args(args)
     setup_logging(args.loglevel)
 
@@ -80,13 +81,13 @@ def main(args):
     dag = build_dag(config)
 
     _logger.info("Running Sr. Octopus...")
-    Scheduler(dag).run()
+    await Scheduler(dag).run()
 
     _logger.info("Done")
 
 
 def run():
-    main(sys.argv[1:])
+    asyncio.run(main(sys.argv[1:]))
 
 
 if __name__ == "__main__":

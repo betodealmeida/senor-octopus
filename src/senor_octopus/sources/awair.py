@@ -1,11 +1,11 @@
 import os
 
 import dateutil.parser
-import requests
+import httpx
 from senor_octopus.types import Stream
 
 
-def awair(prefix: str = "hub.awair") -> Stream:
+async def awair(prefix: str = "hub.awair") -> Stream:
     token = os.environ["AWAIR_ACCESS_TOKEN"]
     device_type = os.environ["AWAIR_DEVICE_TYPE"]
     device_id = os.environ["AWAIR_DEVICE_ID"]
@@ -15,7 +15,8 @@ def awair(prefix: str = "hub.awair") -> Stream:
         f"{device_type}/{device_id}/air-data/latest?fahrenheit=false"
     )
     headers = {"Authorization": f"Bearer {token}"}
-    response = requests.get(url, headers=headers)
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers=headers)
     payload = response.json()
 
     for row in payload["data"]:

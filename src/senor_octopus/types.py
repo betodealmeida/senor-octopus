@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Any
-from typing import Iterator
+from typing import AsyncGenerator
 
 from typing_extensions import Protocol
 from typing_extensions import TypedDict
@@ -12,7 +12,7 @@ class Event(TypedDict):
     value: Any
 
 
-Stream = Iterator[Event]
+Stream = AsyncGenerator[Event, None]
 
 
 class SourceCallable(Protocol):

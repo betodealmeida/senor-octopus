@@ -14,7 +14,13 @@ def postgresql(stream: Stream, table: str = "events") -> None:
     port = os.environ["POSTGRES_PORT"]
     user = os.environ["POSTGRES_USER"]
     password = os.environ["POSTGRES_PASSWORD"]
-    with psycopg2.connect(dbname=dbname, host=host, port=port, user=user, password=password) as connection:
+    with psycopg2.connect(
+        dbname=dbname,
+        host=host,
+        port=port,
+        user=user,
+        password=password,
+    ) as connection:
         with connection.cursor() as cursor:
             _logger.info("Trying to create table `%s`...", table)
             cursor.execute(

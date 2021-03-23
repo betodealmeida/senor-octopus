@@ -143,7 +143,7 @@ def connected(config, source, target) -> bool:
     return True
 
 
-def build_dag(config: configparser.ConfigParser) -> Set[Source]:
+def build_dag(config: configparser.RawConfigParser) -> Set[Source]:
     sections = set(config.sections())
     for section in sections:
         if "flow" not in config[section]:

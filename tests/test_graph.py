@@ -1,37 +1,13 @@
 import random
-from datetime import datetime
+from typing import Dict
 from unittest import mock
 
 import pytest
 from freezegun import freeze_time
-
 from senor_octopus.cli import CaseConfigParser
 from senor_octopus.graph import build_dag
 from senor_octopus.graph import connected
 from senor_octopus.graph import Source
-
-
-config_content = """
-[random]
-plugin = source.random
-flow = -> check, normal
-schedule = * * * * *
-
-[check]
-plugin = filter.jsonpath
-flow = random -> high
-filter = $.events[?(@.value>0.5)]
-
-[normal]
-plugin = sink.log
-flow = random ->
-
-[high]
-plugin = sink.log
-flow = check ->
-throttle = 5 minutes
-level = warning
-"""
 
 
 def test_connected() -> None:
@@ -64,10 +40,8 @@ def test_connected() -> None:
     assert not connected(config, "e", "d")
 
 
-def test_build_dag() -> None:
-    config = CaseConfigParser()
-    config.read_string(config_content)
-    dag = build_dag(config)
+def test_build_dag(mock_config) -> None:
+    dag = build_dag(mock_config)
     assert len(dag) == 1
 
     source = dag.pop()
@@ -81,7 +55,7 @@ def test_build_dag_missing_plugin() -> None:
         """
         [a]
         flow = -> *
-    """
+    """,
     )
     with pytest.raises(Exception) as excinfo:
         build_dag(config)
@@ -103,7 +77,7 @@ def test_build_dag_seen() -> None:
         [c]
         flow = * ->
         plugin = sink.log
-    """
+    """,
     )
     build_dag(config)
 
@@ -114,7 +88,7 @@ def test_build_dag_missing_flow() -> None:
         """
         [a]
         plugin = source.random
-    """
+    """,
     )
     with pytest.raises(Exception) as excinfo:
         build_dag(config)
@@ -128,7 +102,7 @@ def test_build_dag_invalid_plugin() -> None:
         [a]
         plugin = source.invalid
         flow = -> *
-    """
+    """,
     )
     with pytest.raises(Exception) as excinfo:
         build_dag(config)
@@ -136,7 +110,7 @@ def test_build_dag_invalid_plugin() -> None:
 
 
 def test_build_dag_environ(mocker) -> None:
-    mock_env = {}
+    mock_env: Dict[str, str] = {}
     mocker.patch("senor_octopus.graph.os.environ", mock_env)
 
     config = CaseConfigParser()
@@ -146,7 +120,7 @@ def test_build_dag_environ(mocker) -> None:
         flow = -> *
         plugin = source.random
         A_ENV_VAR = 1
-    """
+    """,
     )
     build_dag(config)
     assert mock_env == {"A_ENV_VAR": "1"}
@@ -154,14 +128,12 @@ def test_build_dag_environ(mocker) -> None:
 
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
-async def test_run_source(mocker) -> None:
+async def test_run_source(mocker, mock_config) -> None:
     mock_logger = mock.MagicMock()
     mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
     random.seed(42)
 
-    config = CaseConfigParser()
-    config.read_string(config_content)
-    dag = build_dag(config)
+    dag = build_dag(mock_config)
     source = dag.pop()
 
     await source.run()

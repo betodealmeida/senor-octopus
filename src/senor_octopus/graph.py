@@ -123,12 +123,15 @@ class Sink(Node):
         self.buffer: List[Event] = []
 
     def run(self, stream: Stream) -> None:
-        if self.last_run is None:
-            self.last_run = datetime.now()
-        elif self.throttle and datetime.now() - self.last_run < self.throttle:
+        if (
+            self.last_run is not None
+            and self.throttle
+            and datetime.now() - self.last_run < self.throttle
+        ):
             return
 
         self.plugin(stream, **self.extra_kwargs)
+        self.last_run = datetime.now()
 
 
 def connected(config, source, target) -> bool:

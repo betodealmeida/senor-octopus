@@ -2,9 +2,10 @@
 Changelog
 =========
 
-Version 0.1
-===========
+Version 0.1 - 2021-03-21
+========================
 
-- Feature A added
-- FIX: nasty bug #1729 fixed
-- add your changes here!
+- Initial release
+- Sources: Awair, random numbers
+- Filters: JSONPath
+- Sinks: Pushover, Postgres, logs

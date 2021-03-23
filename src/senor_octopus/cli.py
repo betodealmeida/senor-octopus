@@ -65,7 +65,7 @@ def setup_logging(loglevel):
     )
 
 
-class CaseConfigParser(configparser.ConfigParser):
+class CaseConfigParser(configparser.RawConfigParser):
     def optionxform(self, optionstr):
         return optionstr
 

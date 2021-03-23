@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import Any
 from typing import Iterator
-from typing import Protocol
-from typing import TypedDict
+from typing_extensions import Protocol
+from typing_extensions import TypedDict
 
 
 class Event(TypedDict):

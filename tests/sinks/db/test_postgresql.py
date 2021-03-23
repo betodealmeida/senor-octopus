@@ -1,6 +1,5 @@
 import os
 import random
-import textwrap
 from datetime import datetime
 from unittest import mock
 
@@ -8,8 +7,6 @@ import pytest
 from asynctest import CoroutineMock
 from freezegun import freeze_time
 from psycopg2 import sql
-from psycopg2.extras import Json
-
 from senor_octopus.sinks.db.postgresql import postgresql
 from senor_octopus.sources.rand import rand
 
@@ -45,10 +42,10 @@ async def test_postgresql(mocker) -> None:
                         sql.SQL("\nCREATE TABLE IF NOT EXISTS "),
                         sql.Identifier("events"),
                         sql.SQL(
-                            ' (\n    "timestamp" TIMESTAMP,\n    "name" VARCHAR,\n    "value" JSON\n);\n'
+                            ' (\n    "timestamp" TIMESTAMP,\n    "name" VARCHAR,\n    "value" JSON\n);\n',
                         ),
-                    ]
-                )
+                    ],
+                ),
             ),
             mock.call(
                 sql.Composed(
@@ -58,8 +55,8 @@ async def test_postgresql(mocker) -> None:
                         sql.SQL("\nON "),
                         sql.Identifier("events"),
                         sql.SQL(" USING HASH(name);\n"),
-                    ]
-                )
+                    ],
+                ),
             ),
             mock.call(
                 sql.Composed(
@@ -67,9 +64,9 @@ async def test_postgresql(mocker) -> None:
                         sql.SQL("\nINSERT INTO "),
                         sql.Identifier("events"),
                         sql.SQL(
-                            ' ("timestamp", "name", "value")\nVALUES (%s, %s, %s);\n'
+                            ' ("timestamp", "name", "value")\nVALUES (%s, %s, %s);\n',
                         ),
-                    ]
+                    ],
                 ),
                 (
                     datetime(2021, 1, 1, 0, 0),
@@ -77,7 +74,7 @@ async def test_postgresql(mocker) -> None:
                     mock.ANY,  # Json(0.6394267984578837)
                 ),
             ),
-        ]
+        ],
     )
 
 

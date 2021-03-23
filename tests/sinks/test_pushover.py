@@ -2,7 +2,6 @@ import os
 import random
 
 import pytest
-
 from senor_octopus.sinks.pushover import pushover
 from senor_octopus.sources.rand import rand
 

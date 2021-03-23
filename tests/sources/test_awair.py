@@ -3,7 +3,6 @@ from datetime import datetime
 from datetime import timezone
 
 import pytest
-
 from senor_octopus.sources.awair import awair
 
 mock_payload = {
@@ -25,8 +24,8 @@ mock_payload = {
                 {"comp": "co2", "value": 1.0},
                 {"comp": "temp", "value": 0.0},
             ],
-        }
-    ]
+        },
+    ],
 }
 
 

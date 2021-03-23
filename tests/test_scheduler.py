@@ -2,7 +2,6 @@ from unittest import mock
 
 import pytest
 from asynctest import CoroutineMock
-
 from senor_octopus.scheduler import Scheduler
 
 
@@ -16,7 +15,7 @@ async def test_scheduler() -> None:
     mock_source2.schedule = None
     mock_dag = {mock_source1, mock_source2}
 
-    scheduler = Scheduler(mock_dag)
+    scheduler = Scheduler(mock_dag)  # type: ignore
     with pytest.raises(Exception) as excinfo:
         await scheduler.run()
 

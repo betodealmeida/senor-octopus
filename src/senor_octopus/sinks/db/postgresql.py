@@ -1,5 +1,6 @@
 import logging
 import os
+import textwrap
 
 import aiopg
 from psycopg2 import sql
@@ -22,21 +23,25 @@ async def postgresql(stream: Stream, table: str = "events") -> None:
                 _logger.info("Trying to create table `%s`...", table)
                 await cur.execute(
                     sql.SQL(
-                        """
+                        textwrap.dedent(
+                            """
                             CREATE TABLE IF NOT EXISTS {table} (
                                 "timestamp" TIMESTAMP,
                                 "name" VARCHAR,
                                 "value" JSON
                             );
-                        """,
+                            """,
+                        ),
                     ).format(table=sql.Identifier(table)),
                 )
                 await cur.execute(
                     sql.SQL(
-                        """
+                        textwrap.dedent(
+                            """
                             CREATE INDEX IF NOT EXISTS {index}
                             ON {table} USING HASH(name);
-                        """,
+                            """,
+                        ),
                     ).format(
                         table=sql.Identifier(table),
                         index=sql.Identifier(f"{table}_name_idx"),
@@ -47,10 +52,12 @@ async def postgresql(stream: Stream, table: str = "events") -> None:
                 async for event in stream:
                     await cur.execute(
                         sql.SQL(
-                            """
-                                INSERT INTO {} ("timestamp", "name", "value")
+                            textwrap.dedent(
+                                """
+                                INSERT INTO {table} ("timestamp", "name", "value")
                                 VALUES (%s, %s, %s);
-                            """,
-                        ).format(sql.Identifier(table)),
+                                """,
+                            ),
+                        ).format(table=sql.Identifier(table)),
                         (event["timestamp"], event["name"], Json(event["value"])),
                     )

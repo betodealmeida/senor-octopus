@@ -10,9 +10,11 @@ _logger = logging.getLogger(__name__)
 
 def postgresql(stream: Stream, table: str = "events") -> None:
     dbname = os.environ["POSTGRES_DBNAME"]
+    host = os.environ["POSTGRES_HOST"]
+    port = os.environ["POSTGRES_PORT"]
     user = os.environ["POSTGRES_USER"]
     password = os.environ["POSTGRES_PASSWORD"]
-    with psycopg2.connect(dbname=dbname, user=user, password=password) as connection:
+    with psycopg2.connect(dbname=dbname, host=host, port=port, user=user, password=password) as connection:
         with connection.cursor() as cursor:
             _logger.info("Trying to create table `%s`...", table)
             cursor.execute(

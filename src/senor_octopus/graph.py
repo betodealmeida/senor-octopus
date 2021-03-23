@@ -47,10 +47,7 @@ class Node:
             if re.match("[A-Z_]", key):
                 os.environ[key] = section.pop(key)
 
-        try:
-            flow = section.pop("flow")
-        except KeyError:
-            raise Exception("Invalid config, missing `flow` key")
+        flow = section.pop("flow")
         if flow.startswith("->"):
             return Source(name, plugin, **section)
         if flow.endswith("->"):
@@ -148,6 +145,10 @@ def connected(config, source, target) -> bool:
 
 def build_dag(config: configparser.ConfigParser) -> Set[Source]:
     sections = set(config.sections())
+    for section in sections:
+        if "flow" not in config[section]:
+            raise Exception("Invalid config, missing `flow` key")
+
     sources = {name for name in sections if config[name]["flow"].startswith("->")}
     sinks = {name for name in sections if config[name]["flow"].endswith("->")}
     filters = sections - sources - sinks

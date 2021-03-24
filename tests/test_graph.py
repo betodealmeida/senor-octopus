@@ -1,4 +1,5 @@
 import asyncio
+import random
 from typing import Dict
 from unittest import mock
 
@@ -134,6 +135,7 @@ def test_build_dag_environ(mocker) -> None:
 async def test_run_source(mocker, mock_config) -> None:
     mock_logger = mock.MagicMock()
     mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
+    random.seed(42)
 
     dag = build_dag(mock_config)
     source = dag.pop()

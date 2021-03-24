@@ -11,7 +11,7 @@ async def pushover(stream: Stream) -> None:
     app_token = os.environ["PUSHOVER_APP_TOKEN"]
     user_token = os.environ["PUSHOVER_USER_TOKEN"]
     url = "https://api.pushover.net/1/messages.json"
-    async for event in stream:
+    async for event in stream:  # pragma: no cover
         _logger.info("Posting message to Pushover...")
         data = {
             "token": app_token,

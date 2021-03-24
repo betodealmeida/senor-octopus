@@ -49,7 +49,7 @@ async def postgresql(stream: Stream, table: str = "events") -> None:
                 )
 
                 _logger.info("Inserting events into Postgres...")
-                async for event in stream:
+                async for event in stream:  # pragma: no cover
                     await cur.execute(
                         sql.SQL(
                             textwrap.dedent(

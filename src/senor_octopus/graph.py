@@ -1,3 +1,4 @@
+import asyncio
 import configparser
 import os
 import re
@@ -13,6 +14,7 @@ from typing import Tuple
 from typing import Union
 
 from asyncstdlib import itertools
+from asyncstdlib.builtins import aiter
 from crontab import CronTab
 from durations import Duration
 from pkg_resources import iter_entry_points
@@ -102,22 +104,67 @@ class Sink(Node):
         self.throttle = (
             timedelta(seconds=Duration(throttle).to_seconds()) if throttle else None
         )
-        self.batch = timedelta(seconds=Duration(batch).to_seconds()) if batch else None
+        self.batch = Duration(batch).to_seconds() if batch else None
         self.extra_kwargs = extra_kwargs
 
         self.last_run: Optional[datetime] = None
-        self.buffer: List[Event] = []
+        self.last_batch_start: Optional[float] = None
+        self.queue: asyncio.Queue = asyncio.Queue()
+        self.task = asyncio.create_task(self.worker())
 
     async def run(self, stream: Stream) -> None:
         if (
             self.last_run is not None
             and self.throttle
-            and datetime.now() - self.last_run < self.throttle
+            and datetime.utcnow() - self.last_run < self.throttle
         ):
             return
 
-        await self.plugin(stream, **self.extra_kwargs)  # type: ignore
-        self.last_run = datetime.now()
+        # when in batch mode, send events to queue for worker to process
+        if self.batch:
+            async for event in stream:  # pragma: no cover
+                self.queue.put_nowait(event)
+        else:
+            await self.plugin(stream, **self.extra_kwargs)  # type: ignore
+
+        self.last_run = datetime.utcnow()
+
+    async def worker(self) -> None:
+        if self.batch is None:
+            return
+
+        loop = asyncio.get_running_loop()
+        while True:
+            # consume queue into a new stream
+            stream: List[Event] = []
+            self.last_batch_start = None
+            while True:
+                now = loop.time()
+
+                timeout: Optional[float]
+                if self.last_batch_start is None:
+                    # batch hasn't started, we can wait forever on a new event
+                    timeout = None
+                else:
+                    # wait on new event while the batch lasts
+                    timeout = self.last_batch_start + self.batch - now
+
+                try:
+                    event = await asyncio.wait_for(self.queue.get(), timeout)
+                except asyncio.TimeoutError:
+                    break
+                except RuntimeError:
+                    return
+
+                # first event in a batch?
+                if self.last_batch_start is None:
+                    self.last_batch_start = loop.time()
+
+                stream.append(event)
+                self.queue.task_done()
+
+            # process batch
+            await self.plugin(aiter(stream), **self.extra_kwargs)  # type: ignore
 
 
 def connected(config, source, target) -> bool:

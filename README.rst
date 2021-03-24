@@ -29,6 +29,7 @@ Señor Octopus reads a pipeline defintion from a configuration file like this:
     [normal]
     plugin = sink.log
     flow = * ->
+    batch = 5 minutes
 
     # log all the numbers coming from "check" at the warning level
     [high]
@@ -48,7 +49,7 @@ The example above has a **source** called "random", that generates random number
 
 The node ``check`` is a **filter** that verifies that the value of each number is greater than 0.5. Events that pass the filter are sent to the ``high`` node (the filter connects the two nodes, according to ``flow = random -> high``).
 
-The node ``normal`` is a **sink** that logs events. It receives events from any other node (``flow = * ->``), and simply logs them at the ``INFO`` level (the default). The node ``high``, on the other hand, receives events only from ``check``, and logs them at the ``WARNING`` level.
+The node ``normal`` is a **sink** that logs events. It receives events from any other node (``flow = * ->``), and stores them in a queue, logging them at the ``INFO`` level (the default) every 5 minutes (``batch = 5 minutes``). The node ``high``, on the other hand, receives events only from ``check``, and logs them immediately at the ``WARNING`` level.
 
 To run it:
 

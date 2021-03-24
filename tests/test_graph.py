@@ -1,7 +1,8 @@
-import random
+import asyncio
 from typing import Dict
 from unittest import mock
 
+import aiotools
 import pytest
 from freezegun import freeze_time
 from senor_octopus.cli import CaseConfigParser
@@ -40,7 +41,8 @@ def test_connected() -> None:
     assert not connected(config, "e", "d")
 
 
-def test_build_dag(mock_config) -> None:
+@pytest.mark.asyncio
+async def test_build_dag(mock_config) -> None:
     dag = build_dag(mock_config)
     assert len(dag) == 1
 
@@ -62,7 +64,8 @@ def test_build_dag_missing_plugin() -> None:
     assert str(excinfo.value) == "Invalid config, missing `plugin` key"
 
 
-def test_build_dag_seen() -> None:
+@pytest.mark.asyncio
+async def test_build_dag_seen() -> None:
     config = CaseConfigParser()
     config.read_string(
         """
@@ -131,7 +134,6 @@ def test_build_dag_environ(mocker) -> None:
 async def test_run_source(mocker, mock_config) -> None:
     mock_logger = mock.MagicMock()
     mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
-    random.seed(42)
 
     dag = build_dag(mock_config)
     source = dag.pop()
@@ -142,3 +144,66 @@ async def test_run_source(mocker, mock_config) -> None:
     # test throttle, should get 10 entries from the non-throttled sink
     await source.run()
     assert len(mock_logger.log.mock_calls) == 24
+
+
+@pytest.mark.asyncio
+async def test_batch(mocker) -> None:
+    mock_logger = mock.MagicMock()
+    mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
+    vclock = aiotools.VirtualClock()
+
+    config_content = """
+[random]
+plugin = source.random
+flow = -> log
+schedule = * * * * *
+
+[log]
+plugin = sink.log
+flow = random ->
+batch = 2 minutes
+    """
+    config = CaseConfigParser()
+    config.read_string(config_content)
+
+    with vclock.patch_loop():
+        dag = build_dag(config)
+        source = dag.pop()
+
+        await source.run()
+        assert len(mock_logger.log.mock_calls) == 0
+
+        await asyncio.sleep(180)
+        assert len(mock_logger.log.mock_calls) == 10
+
+
+@pytest.mark.asyncio
+async def test_batch_empty_source(mocker) -> None:
+    mock_logger = mock.MagicMock()
+    mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
+    vclock = aiotools.VirtualClock()
+
+    config_content = """
+[random]
+plugin = source.random
+flow = -> log
+schedule = * * * * *
+events = 0
+
+[log]
+plugin = sink.log
+flow = random ->
+batch = 2 minutes
+    """
+    config = CaseConfigParser()
+    config.read_string(config_content)
+
+    with vclock.patch_loop():
+        dag = build_dag(config)
+        source = dag.pop()
+
+        await source.run()
+        assert len(mock_logger.log.mock_calls) == 0
+
+        await asyncio.sleep(180)
+        assert len(mock_logger.log.mock_calls) == 0

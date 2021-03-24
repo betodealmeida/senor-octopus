@@ -10,8 +10,9 @@ _logger = logging.getLogger(__name__)
 
 
 class Scheduler:
-    def __init__(self, dag: Set[Source]):
+    def __init__(self, dag: Set[Source], tolerance: int = 5):
         self.dag = dag
+        self.tolerance = tolerance
 
     async def run(self) -> None:
         _logger.info("Starting scheduler...")
@@ -20,8 +21,12 @@ class Scheduler:
             delays: Dict[int, Set[Source]] = defaultdict(set)
             for node in self.dag:
                 if node.schedule:
-                    delays[node.schedule.next(default_utc=True)].add(node)
+                    next_run = int(node.schedule.next(default_utc=True))
+                    next_run = next_run - next_run % self.tolerance
+                    delays[next_run].add(node)
             min_delay = min(delays)
             _logger.info(f"Sleeping for {min_delay} seconds...")
             await asyncio.sleep(min_delay)
-            await asyncio.gather(*[node.run() for node in delays[min_delay]])
+            await asyncio.gather(
+                *[node.run() for node in delays[min_delay]], return_exceptions=True
+            )

@@ -54,13 +54,6 @@ class Node:
             return Sink(name, plugin, **section)
         return Filter(name, plugin, **section)
 
-    def __repr__(self) -> str:
-        return (
-            "\n".join(f"{self.name} -> {node!r}" for node in self.next)
-            if self.next
-            else self.name
-        )
-
 
 class Source(Node):
     def __init__(

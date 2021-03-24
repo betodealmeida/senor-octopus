@@ -16,8 +16,8 @@ async def test_scheduler() -> None:
     mock_dag = {mock_source1, mock_source2}
 
     scheduler = Scheduler(mock_dag)  # type: ignore
-    with pytest.raises(Exception) as excinfo:
+    with pytest.raises(RuntimeError) as excinfo:
         await scheduler.run()
 
-    assert str(excinfo.value) == "Stopped"
-    assert len(mock_source1.run.mock_calls) == 2
+    assert str(excinfo.value) == "coroutine raised StopIteration"
+    assert len(mock_source1.run.mock_calls) == 3

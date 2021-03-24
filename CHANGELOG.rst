@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.1.3 - 2021-03-21
+==========================
+
+- Group tasks with a tolerance in scheduler
+- Prevent failed tasks from stopping scheduler
+
 Version 0.1.2 - 2021-03-21
 ==========================
 

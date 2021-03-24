@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.2 - 2021-03-21
+==========================
+
+- Add missing entry point to Speedtest source
+
 Version 0.1.1 - 2021-03-21
 ==========================
 

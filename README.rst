@@ -19,7 +19,7 @@ Señor Octopus reads a pipeline defintion from a configuration file like this:
     flow = -> check, normal
     schedule = * * * * *
 
-    # check that the numbers from "random" are > 0.5 and send to "high"
+    # filter numbers from "random" that are > 0.5 and send to "high"
     [check]
     plugin = filter.jsonpath
     flow = random -> high
@@ -30,7 +30,7 @@ Señor Octopus reads a pipeline defintion from a configuration file like this:
     plugin = sink.log
     flow = * ->
 
-    " log all the numbers coming from "check" at the warning level
+    # log all the numbers coming from "check" at the warning level
     [high]
     plugin = sink.log
     flow = check ->

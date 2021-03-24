@@ -48,7 +48,7 @@ The example above has a **source** called "random", that generates random number
 
 The node ``check`` is a **filter** that verifies that the value of each number is greater than 0.5. Events that pass the filter are sent to the ``high`` node (the filter connects the two nodes, according to ``flow = random -> high``).
 
-The node ``normal`` is a **sink** that logs events. It receices events from any other node (``flow = * ->``), and simply logs them at the ``INFO`` level (the default). The node ``high``, on the other hand, receives events only from ``check``, and logs them at the ``WARNING`` level.
+The node ``normal`` is a **sink** that logs events. It receives events from any other node (``flow = * ->``), and simply logs them at the ``INFO`` level (the default). The node ``high``, on the other hand, receives events only from ``check``, and logs them at the ``WARNING`` level.
 
 To run it:
 

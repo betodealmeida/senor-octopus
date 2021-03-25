@@ -127,6 +127,7 @@ class Sink(Node):
         else:
             await self.plugin(stream, **self.extra_kwargs)  # type: ignore
 
+        # TODO: only update if at least 1 event was received
         self.last_run = datetime.utcnow()
 
     async def worker(self) -> None:
@@ -199,10 +200,10 @@ def build_dag(config: configparser.RawConfigParser) -> Set[Source]:
     while queue:
         source, target = queue.pop()
         if target in seen:
-            continue
-
-        node = Node.build(target, dict(config[target]))
-        seen[target] = node
+            node = seen[target]
+        else:
+            node = Node.build(target, dict(config[target]))
+            seen[target] = node
 
         if source:
             node = cast(Union[Filter, Sink], node)

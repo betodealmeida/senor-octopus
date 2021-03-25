@@ -52,6 +52,31 @@ async def test_build_dag(mock_config) -> None:
     assert len(source.next) == 2
 
 
+@pytest.mark.asyncio
+async def test_build_dag_many_to_one() -> None:
+    config = CaseConfigParser()
+    config.read_string(
+        """
+        [one]
+        plugin = source.random
+        flow = -> three
+
+        [two]
+        plugin = source.random
+        flow = -> three
+
+        [three]
+        plugin = sink.log
+        flow = * ->
+    """,
+    )
+    dag = build_dag(config)
+    assert len(dag) == 2
+
+    one, two = dag
+    assert one.next == two.next
+
+
 def test_build_dag_missing_plugin() -> None:
     config = CaseConfigParser()
     config.read_string(

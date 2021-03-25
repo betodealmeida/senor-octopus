@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.6 - 2021-03-25
+==========================
+
+- Fix DAG builder n:1 relationships
+
 Version 0.1.5 - 2021-03-25
 ==========================
 

@@ -56,6 +56,19 @@ To run it:
 .. code-block:: bash
 
     $ srocto config.ini -vv
+    [2021-03-25 14:28:26] INFO:senor_octopus.cli:Reading configuration
+    [2021-03-25 14:28:26] INFO:senor_octopus.cli:Building DAG
+    [2021-03-25 14:28:26] INFO:senor_octopus.cli:
+    *   random
+    |\
+    * | check
+    | * normal
+    * high
+
+    [2021-03-25 14:28:26] INFO:senor_octopus.cli:Running Sr. Octopus
+    [2021-03-25 14:28:26] INFO:senor_octopus.scheduler:Starting scheduler
+    [2021-03-25 14:28:26] INFO:senor_octopus.scheduler:Scheduling random to run in 33.76353 seconds
+    [2021-03-25 14:28:26] DEBUG:senor_octopus.scheduler:Sleeping for 5 seconds
 
 A concrete example
 ==================

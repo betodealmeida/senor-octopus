@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.5 - YYYY-mm-dd
+==========================
+
+- New source: Weatherapi
+
 Version 0.1.4 - 2021-03-23
 ==========================
 

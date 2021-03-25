@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from collections import defaultdict
 from typing import Dict
 from typing import Set
 
@@ -9,24 +8,38 @@ from senor_octopus.graph import Source
 _logger = logging.getLogger(__name__)
 
 
+SLEEP_TIME = 1
+
+
 class Scheduler:
-    def __init__(self, dag: Set[Source], tolerance: int = 5):
+    def __init__(self, dag: Set[Source]):
         self.dag = dag
-        self.tolerance = tolerance
 
     async def run(self) -> None:
-        _logger.info("Starting scheduler...")
+        nodes = {node for node in self.dag if node.schedule}
+        if not nodes:
+            _logger.info("Nothing to schedule...")
+            return
 
+        _logger.info("Starting scheduler...")
+        loop = asyncio.get_event_loop()
+
+        schedules: Dict[str, float] = {}
         while True:
-            delays: Dict[int, Set[Source]] = defaultdict(set)
-            for node in self.dag:
-                if node.schedule:
-                    next_run = int(node.schedule.next(default_utc=True))
-                    next_run = next_run - next_run % self.tolerance
-                    delays[next_run].add(node)
-            min_delay = min(delays)
-            _logger.info(f"Sleeping for {min_delay} seconds...")
-            await asyncio.sleep(min_delay)
-            await asyncio.gather(
-                *[node.run() for node in delays[min_delay]], return_exceptions=True
-            )
+            for node in nodes:
+                now = loop.time()
+                delay = node.schedule.next(default_utc=False)
+                when = now + delay
+
+                if node.name not in schedules:
+                    _logger.info(f"Scheduling {node.name} to run in {delay} seconds...")
+                    schedules[node.name] = when
+                elif schedules[node.name] > now:
+                    continue
+                else:
+                    _logger.info(f"Running {node.name}...")
+                    await node.run()
+                    del schedules[node.name]
+
+            _logger.debug(f"Sleeping for {SLEEP_TIME} seconds...")
+            await asyncio.sleep(SLEEP_TIME)

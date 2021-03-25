@@ -75,12 +75,12 @@ async def main(args):
     args = parse_args(args)
     setup_logging(args.loglevel)
 
-    _logger.info("Reading configuration...")
+    _logger.info("Reading configuration")
     config = CaseConfigParser()
     config.read(args.f)
     dag = build_dag(config)
 
-    _logger.info("Running Sr. Octopus...")
+    _logger.info("Running Sr. Octopus")
     await Scheduler(dag).run()
 
     _logger.info("Done")

@@ -1,5 +1,6 @@
 import asyncio
 import configparser
+import logging
 import os
 import re
 from datetime import datetime
@@ -28,7 +29,9 @@ from senor_octopus.types import Stream
 class Node:
     def __init__(self, name: str):
         self.name = name
+
         self.next: Set[Union["Filter", "Sink"]] = set()
+        self._logger = logging.getLogger(name)
 
     @staticmethod
     def build(name: str, section: Dict[str, Any]) -> Union["Source", "Filter", "Sink"]:
@@ -71,6 +74,7 @@ class Source(Node):
         self.extra_kwargs = extra_kwargs
 
     async def run(self) -> None:
+        self._logger.info("Running")
         stream = self.plugin(**self.extra_kwargs)
         async with itertools.tee(stream, n=len(self.next)) as streams:
             for node, stream in zip(self.next, streams):
@@ -84,6 +88,7 @@ class Filter(Node):
         self.extra_kwargs = extra_kwargs
 
     async def run(self, stream: Stream) -> None:
+        self._logger.info("Running")
         stream = self.plugin(stream, **self.extra_kwargs)
         async with itertools.tee(stream, n=len(self.next)) as streams:
             for node, stream in zip(self.next, streams):
@@ -118,13 +123,21 @@ class Sink(Node):
             and self.throttle
             and datetime.utcnow() - self.last_run < self.throttle
         ):
+            self._logger.info(
+                "Last run was %s, skipping this one due to throttle",
+                self.last_run,
+            )
             return
+
+        self._logger.info("Running")
 
         # when in batch mode, send events to queue for worker to process
         if self.batch:
+            self._logger.info("Sending events to queue")
             async for event in stream:  # pragma: no cover
                 self.queue.put_nowait(event)
         else:
+            self._logger.info("Processing events")
             await self.plugin(stream, **self.extra_kwargs)  # type: ignore
 
         # TODO: only update if at least 1 event was received
@@ -159,12 +172,13 @@ class Sink(Node):
 
                 # first event in a batch?
                 if self.last_batch_start is None:
+                    self._logger.info("Received event, starting a new batch")
                     self.last_batch_start = loop.time()
 
                 stream.append(event)
                 self.queue.task_done()
 
-            # process batch
+            self._logger.info("Processing batch")
             await self.plugin(aiter(stream), **self.extra_kwargs)  # type: ignore
 
 

@@ -16,11 +16,12 @@ async def postgresql(stream: Stream, table: str = "events") -> None:
     port = os.environ["POSTGRES_PORT"]
     user = os.environ["POSTGRES_USER"]
     password = os.environ["POSTGRES_PASSWORD"]
+
     dsn = f"dbname={dbname} user={user} password={password} host={host} port={port}"
     async with aiopg.create_pool(dsn) as pool:
         async with pool.acquire() as conn:
             async with conn.cursor() as cur:
-                _logger.info("Trying to create table `%s`...", table)
+                _logger.debug("Trying to create table `%s`", table)
                 await cur.execute(
                     sql.SQL(
                         textwrap.dedent(
@@ -34,6 +35,7 @@ async def postgresql(stream: Stream, table: str = "events") -> None:
                         ),
                     ).format(table=sql.Identifier(table)),
                 )
+                _logger.debug("Trying to create index `%s_name_idx`", table)
                 await cur.execute(
                     sql.SQL(
                         textwrap.dedent(
@@ -48,8 +50,9 @@ async def postgresql(stream: Stream, table: str = "events") -> None:
                     ),
                 )
 
-                _logger.info("Inserting events into Postgres...")
+                _logger.info("Inserting events into Postgres")
                 async for event in stream:  # pragma: no cover
+                    _logger.debug(event)
                     await cur.execute(
                         sql.SQL(
                             textwrap.dedent(

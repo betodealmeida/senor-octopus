@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.9 - 2021-03-25
+==========================
+
+- Add missing dependency to setup.py
+
 Version 0.1.8 - 2021-03-25
 ==========================
 

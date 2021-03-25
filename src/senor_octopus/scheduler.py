@@ -34,9 +34,7 @@ class Scheduler:
                 if node.name not in schedules:
                     _logger.info(f"Scheduling {node.name} to run in {delay} seconds...")
                     schedules[node.name] = when
-                elif schedules[node.name] > now:
-                    continue
-                else:
+                elif schedules[node.name] <= now:
                     _logger.info(f"Running {node.name}...")
                     await node.run()
                     del schedules[node.name]

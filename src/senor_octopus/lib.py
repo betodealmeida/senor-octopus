@@ -1,8 +1,15 @@
+from io import StringIO
 from typing import Any
 from typing import Dict
 from typing import List
+from typing import Set
 from typing import Tuple
 from typing import Union
+
+import asciidag.graph
+import asciidag.node
+from senor_octopus.graph import Node
+from senor_octopus.graph import Source
 
 
 def flatten(
@@ -18,3 +25,22 @@ def flatten(
         else:
             items.append((new_key, value))
     return dict(items)
+
+
+def render_dag(dag: Set[Source], **kwargs: Any) -> str:
+    out = StringIO()
+    graph = asciidag.graph.Graph(out, **kwargs)
+    tips = sorted(build_asciidag(node) for node in dag)
+
+    graph.show_nodes(tips)
+    out.seek(0)
+    return out.getvalue()
+
+
+def build_asciidag(node: Node) -> asciidag.node.Node:
+    asciidag_node = asciidag.node.Node(node.name)
+    asciidag_node.parents = sorted(
+        [build_asciidag(child) for child in node.next],
+        key=lambda n: n.item,
+    )
+    return asciidag_node

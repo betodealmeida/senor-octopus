@@ -2,10 +2,11 @@
 Changelog
 =========
 
-Version 0.1.5 - YYYY-mm-dd
+Version 0.1.5 - 2021-03-25
 ==========================
 
 - New source: Weatherapi
+- Improved scheduler
 
 Version 0.1.4 - 2021-03-23
 ==========================

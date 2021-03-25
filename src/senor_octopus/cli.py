@@ -6,6 +6,7 @@ import sys
 
 from senor_octopus import __version__
 from senor_octopus.graph import build_dag
+from senor_octopus.lib import render_dag
 from senor_octopus.scheduler import Scheduler
 
 __author__ = "Beto Dealmeida"
@@ -78,7 +79,9 @@ async def main(args):
     _logger.info("Reading configuration")
     config = CaseConfigParser()
     config.read(args.f)
+    _logger.info("Building DAG")
     dag = build_dag(config)
+    _logger.info("\n%s", render_dag(dag))
 
     _logger.info("Running Sr. Octopus")
     await Scheduler(dag).run()

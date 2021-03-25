@@ -42,6 +42,6 @@ def mock_config():
 
 
 @pytest.fixture
-def mock_dag(mock_config):
+async def mock_dag(mock_config):
     dag = build_dag(mock_config)
     yield dag

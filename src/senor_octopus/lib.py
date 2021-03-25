@@ -30,17 +30,30 @@ def flatten(
 def render_dag(dag: Set[Source], **kwargs: Any) -> str:
     out = StringIO()
     graph = asciidag.graph.Graph(out, **kwargs)
-    tips = sorted([build_asciidag(node) for node in dag], key=lambda n: n.item)
+    asciidag_nodes: Dict[str, asciidag.node.Node] = {}
+    tips = sorted(
+        [build_asciidag(node, asciidag_nodes) for node in dag],
+        key=lambda n: n.item,
+    )
 
     graph.show_nodes(tips)
     out.seek(0)
     return out.getvalue()
 
 
-def build_asciidag(node: Node) -> asciidag.node.Node:
-    asciidag_node = asciidag.node.Node(node.name)
+def build_asciidag(
+    node: Node,
+    asciidag_nodes: Dict[str, asciidag.node.Node],
+) -> asciidag.node.Node:
+    if node.name in asciidag_nodes:
+        asciidag_node = asciidag_nodes[node.name]
+    else:
+        asciidag_node = asciidag.node.Node(node.name)
+        asciidag_nodes[node.name] = asciidag_node
+
     asciidag_node.parents = sorted(
-        [build_asciidag(child) for child in node.next],
+        [build_asciidag(child, asciidag_nodes) for child in node.next],
         key=lambda n: n.item,
     )
+
     return asciidag_node

@@ -36,7 +36,7 @@ class Scheduler:
                     schedules[node.name] = when
                 elif schedules[node.name] <= now:
                     _logger.info(f"Running {node.name}")
-                    await node.run()
+                    asyncio.create_task(node.run())
                     del schedules[node.name]
 
             _logger.debug(f"Sleeping for {SLEEP_TIME} seconds")

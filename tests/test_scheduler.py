@@ -11,7 +11,7 @@ async def test_scheduler() -> None:
     mock_source1 = mock.MagicMock()
     mock_source1.schedule.next.return_value = 10
     mock_source1.run = CoroutineMock()
-    mock_source1.run.side_effect = [None, None, Exception("Stopped")]
+    mock_source1.run.side_effect = [None, None]
     mock_source2 = mock.MagicMock()
     mock_source2.schedule = None
     mock_dag = {mock_source1, mock_source2}
@@ -22,7 +22,7 @@ async def test_scheduler() -> None:
         with pytest.raises(Exception) as excinfo:
             await scheduler.run()
 
-    assert str(excinfo.value) == "Stopped"
+    assert str(excinfo.value) == "coroutine raised StopIteration"
     assert len(mock_source1.run.mock_calls) == 3
 
 

@@ -123,6 +123,7 @@ Here's another example, a pipeline that will notify you if tomorrow will rain:
     plugin = source.weatherapi
     flow = -> will_it_rain
     schedule = 0 12 * * *
+    location = London
     WEATHERAPI_TOKEN = XXX
 
     [will_it_rain]

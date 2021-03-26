@@ -111,3 +111,28 @@ This is the config I use for that:
     POSTGRES_PORT = 5432
 
 I'm using `Pushover <https://pushover.net/>`_ to send notifications to my phone.
+
+Will it rain?
+=============
+
+Here's another example, a pipeline that will notify you if tomorrow will rain:
+
+.. code-block:: ini
+
+    [weather]
+    plugin = source.weatherapi
+    flow = -> will_it_rain
+    schedule = 0 12 * * *
+    WEATHERAPI_TOKEN = XXX
+
+    [will_it_rain]
+    plugin = filter.jsonpath
+    flow = weather -> pushover
+    filter = $.events[?(@.name=="hub.weatherapi.forecast.forecastday.daily_will_it_rain" and @.value==1)]
+
+    [pushover]
+    plugin = sink.pushover
+    flow = will_it_rain ->
+    throttle = 30 minutes
+    PUSHOVER_APP_TOKEN = XXX
+    PUSHOVER_USER_TOKEN = johndoe

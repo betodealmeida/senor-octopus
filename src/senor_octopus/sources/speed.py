@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from datetime import timezone
 
 import speedtest
 from senor_octopus.types import Stream
@@ -17,7 +18,7 @@ async def speed(prefix: str = "hub.speedtest") -> Stream:
 
     for key, value in s.results.dict().items():
         yield {
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(timezone.utc),
             "name": f"{prefix}.{key}",
             "value": value,
         }

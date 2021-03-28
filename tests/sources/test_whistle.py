@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from datetime import timezone
 
 import pytest
 from aioresponses import aioresponses
@@ -121,32 +122,32 @@ async def test_whistle(mocker) -> None:
     print(sorted(events, key=lambda e: e["name"]))
     assert sorted(events, key=lambda e: e["name"]) == [
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.whistle.Rex.battery_level",
             "value": 96,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.whistle.Rex.battery_status",
             "value": "on",
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.whistle.Rex.geohash",
             "value": "c00000000000",
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.whistle.Rex.last_check_in",
             "value": "2021-03-25T15:52:19-07:00 America/Los_Angeles",
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.whistle.Rex.location",
             "value": (45.0, -135.0),
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.whistle.Rex.tracking_status",
             "value": "not_tracking",
         },

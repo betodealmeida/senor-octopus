@@ -19,17 +19,23 @@ class Scheduler:
         self.cancelled = False
 
     async def run(self) -> None:
-        nodes = {node for node in self.dag if node.schedule}
-        if not nodes:
-            _logger.info("Nothing to schedule")
+        if not self.dag:
+            _logger.info("Nothing to run")
             return
 
         _logger.info("Starting scheduler")
         loop = asyncio.get_event_loop()
 
+        event_nodes = {node for node in self.dag if not node.schedule}
+        for node in event_nodes:
+            _logger.debug("Starting %s", node.name)
+            task = asyncio.create_task(node.run())
+            self.tasks.append(task)
+
+        schedule_nodes = {node for node in self.dag if node.schedule}
         schedules: Dict[str, float] = {}
         while not self.cancelled:
-            for node in nodes:
+            for node in schedule_nodes:
                 now = loop.time()
                 delay = node.schedule.next(default_utc=False)
                 when = now + delay

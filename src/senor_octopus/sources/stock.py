@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from datetime import timezone
 from typing import List
 from typing import Union
 
@@ -27,7 +28,7 @@ async def stock(symbols: Union[str, List[str]], prefix: str = "hub.stock") -> St
                 value,
             )
             yield {
-                "timestamp": datetime.utcnow(),
+                "timestamp": datetime.now(timezone.utc),
                 "name": f"{prefix}.{symbol}.{attribute}",
                 "value": value,
             }

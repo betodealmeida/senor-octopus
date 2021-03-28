@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from datetime import timezone
 from typing import List
 from typing import Union
 
@@ -24,7 +25,7 @@ async def crypto(
         value = info[coin][currency]
         _logger.debug("%s: %s %s", coin, currency, value)
         yield {
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(timezone.utc),
             "name": f"{prefix}.{coin}.{currency}",
             "value": value,
         }

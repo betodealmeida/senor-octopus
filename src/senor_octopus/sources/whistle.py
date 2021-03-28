@@ -1,6 +1,7 @@
 import logging
 import os
 from datetime import datetime
+from datetime import timezone
 
 import geohash
 from aiohttp import ClientSession
@@ -33,7 +34,7 @@ async def whistle(prefix: str = "hub.whistle") -> Stream:
             }
             for key in keys:
                 yield {
-                    "timestamp": datetime.utcnow(),
+                    "timestamp": datetime.now(timezone.utc),
                     "name": f"{prefix}.{name}.{key}",
                     "value": pet["device"][key],
                 }
@@ -41,12 +42,12 @@ async def whistle(prefix: str = "hub.whistle") -> Stream:
             # last location
             location = pet["last_location"]
             yield {
-                "timestamp": datetime.utcnow(),
+                "timestamp": datetime.now(timezone.utc),
                 "name": f"{prefix}.{name}.location",
                 "value": (location["latitude"], location["longitude"]),
             }
             yield {
-                "timestamp": datetime.utcnow(),
+                "timestamp": datetime.now(timezone.utc),
                 "name": f"{prefix}.{name}.geohash",
                 "value": geohash.encode(location["latitude"], location["longitude"]),
             }

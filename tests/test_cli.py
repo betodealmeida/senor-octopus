@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import sys
 from unittest import mock
@@ -45,12 +46,26 @@ async def test_main(mocker) -> None:
 
     mock_scheduler = mock.MagicMock()
     mock_scheduler.return_value.run = CoroutineMock()
-    mock_scheduler.return_value.run.side_effect = [None, Exception("Stopped")]
     mocker.patch("senor_octopus.cli.Scheduler", mock_scheduler)
 
     await main(["config.ini"])
 
     mock_scheduler.return_value.run.assert_called()
+
+
+@pytest.mark.asyncio
+async def test_main_canceled(mocker) -> None:
+    mocker.patch("senor_octopus.cli.CaseConfigParser")
+    mocker.patch("senor_octopus.cli.build_dag")
+
+    mock_scheduler = mock.MagicMock()
+    mock_scheduler.return_value.run = CoroutineMock()
+    mock_scheduler.return_value.run.side_effect = asyncio.CancelledError("Canceled")
+    mocker.patch("senor_octopus.cli.Scheduler", mock_scheduler)
+
+    await main(["config.ini"])
+
+    mock_scheduler.return_value.cancel.assert_called()
 
 
 def test_run(mocker) -> None:
@@ -61,3 +76,16 @@ def test_run(mocker) -> None:
     run()
 
     mock_main.assert_called_with(["config.ini", "-vv"])
+
+
+def test_interrupt(mocker) -> None:
+    mock_main = CoroutineMock()
+    mock_main.side_effect = KeyboardInterrupt()
+    mocker.patch("senor_octopus.cli.main", mock_main)
+    mocker.patch("senor_octopus.cli.sys.argv", ["srocto", "config.ini", "-vv"])
+    mock_logger = mocker.MagicMock()
+    mocker.patch("senor_octopus.cli._logger", mock_logger)
+
+    run()
+
+    assert mock_logger.info.called_with("Stopping Sr. Octopus")

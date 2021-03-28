@@ -1,3 +1,4 @@
+import asyncio
 from unittest import mock
 
 import aiotools
@@ -24,6 +25,27 @@ async def test_scheduler() -> None:
 
     assert str(excinfo.value) == "coroutine raised StopIteration"
     assert len(mock_source1.run.mock_calls) == 3
+
+
+@pytest.mark.asyncio
+async def test_scheduler_cancel() -> None:
+    mock_source1 = mock.MagicMock()
+    mock_source1.schedule.next.return_value = 10
+    mock_source1.run = CoroutineMock()
+    mock_dag = {mock_source1}
+    vclock = aiotools.VirtualClock()
+
+    async def cancel_scheduler(scheduler) -> None:
+        await asyncio.sleep(30)
+        scheduler.cancel()
+
+    with vclock.patch_loop():
+        scheduler = Scheduler(mock_dag)  # type: ignore
+        await asyncio.gather(scheduler.run(), cancel_scheduler(scheduler))
+
+    assert len(scheduler.tasks) == 2
+    assert scheduler.cancelled
+    assert len(mock_source1.run.mock_calls) == 2
 
 
 @pytest.mark.asyncio

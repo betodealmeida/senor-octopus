@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from typing import Dict
+from typing import List
 from typing import Set
 
 from senor_octopus.graph import Source
@@ -14,6 +15,8 @@ SLEEP_TIME = 5
 class Scheduler:
     def __init__(self, dag: Set[Source]):
         self.dag = dag
+        self.tasks: List[asyncio.Task] = []
+        self.cancelled = False
 
     async def run(self) -> None:
         nodes = {node for node in self.dag if node.schedule}
@@ -25,7 +28,7 @@ class Scheduler:
         loop = asyncio.get_event_loop()
 
         schedules: Dict[str, float] = {}
-        while True:
+        while not self.cancelled:
             for node in nodes:
                 now = loop.time()
                 delay = node.schedule.next(default_utc=False)
@@ -36,8 +39,14 @@ class Scheduler:
                     schedules[node.name] = when
                 elif schedules[node.name] <= now:
                     _logger.info(f"Running {node.name}")
-                    asyncio.create_task(node.run())
+                    task = asyncio.create_task(node.run())
+                    self.tasks.append(task)
                     del schedules[node.name]
 
             _logger.debug(f"Sleeping for {SLEEP_TIME} seconds")
             await asyncio.sleep(SLEEP_TIME)
+
+    def cancel(self) -> None:
+        for task in self.tasks:
+            task.cancel()
+        self.cancelled = True

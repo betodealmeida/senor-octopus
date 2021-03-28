@@ -21,6 +21,7 @@ async def test_stock(mocker) -> None:
 
     symbols = "FB, LYFT"
     events = [event async for event in stock(symbols)]
+    events = sorted(events, key=lambda e: e["name"])
     assert events == [
         {
             "timestamp": datetime(2021, 1, 1, 0, 0),
@@ -46,6 +47,7 @@ async def test_stock(mocker) -> None:
 
     symbols = ["FB", "LYFT"]
     events = [event async for event in stock(symbols)]
+    events = sorted(events, key=lambda e: e["name"])
     assert events == [
         {
             "timestamp": datetime(2021, 1, 1, 0, 0),

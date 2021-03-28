@@ -6,7 +6,7 @@ Version 0.1.10 - ????-??-??
 ===========================
 
 - Fix scheduler to run tasks in background
-- New source: Whistle
+- New sources: Whistle, stocks, crypto
 
 Version 0.1.9 - 2021-03-25
 ==========================

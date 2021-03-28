@@ -84,13 +84,21 @@ async def main(args):
     _logger.info("\n%s", render_dag(dag))
 
     _logger.info("Running Sr. Octopus")
-    await Scheduler(dag).run()
+    scheduler = Scheduler(dag)
+    try:
+        await scheduler.run()
+    except asyncio.CancelledError:
+        _logger.info("Canceled")
+        scheduler.cancel()
 
     _logger.info("Done")
 
 
 def run():
-    asyncio.run(main(sys.argv[1:]))
+    try:
+        asyncio.run(main(sys.argv[1:]))
+    except KeyboardInterrupt:
+        _logger.info("Stopping Sr. Octopus")
 
 
 if __name__ == "__main__":

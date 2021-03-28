@@ -5,7 +5,8 @@ Changelog
 Version 0.1.10 - ????-??-??
 ===========================
 
-- Fix scheduler to run tasks in background
+- Modified scheduler to run tasks in background
+- Modified scheduler to gracefully cancel tasks
 - New sources: Whistle, stocks, crypto
 
 Version 0.1.9 - 2021-03-25

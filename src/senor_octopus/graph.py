@@ -148,7 +148,8 @@ class Sink(Node):
             return
 
         loop = asyncio.get_running_loop()
-        while True:
+        canceled = False
+        while not canceled:
             # consume queue into a new stream
             stream: List[Event] = []
             self.last_batch_start = None
@@ -169,6 +170,10 @@ class Sink(Node):
                     break
                 except RuntimeError:
                     return
+                except asyncio.CancelledError:
+                    self._logger.info("Cancelled, dumping currently batched events")
+                    canceled = True
+                    break
 
                 # first event in a batch?
                 if self.last_batch_start is None:

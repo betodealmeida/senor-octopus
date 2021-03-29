@@ -9,9 +9,6 @@ from senor_octopus.graph import Source
 _logger = logging.getLogger(__name__)
 
 
-SLEEP_TIME = 5
-
-
 class Scheduler:
     def __init__(self, dag: Set[Source]):
         self.dag = dag
@@ -40,17 +37,19 @@ class Scheduler:
                 delay = node.schedule.next(default_utc=False)
                 when = now + delay
 
-                if node.name not in schedules:
-                    _logger.info(f"Scheduling {node.name} to run in {delay} seconds")
-                    schedules[node.name] = when
-                elif schedules[node.name] <= now:
+                if node.name in schedules and schedules[node.name] <= now:
                     _logger.info(f"Running {node.name}")
                     task = asyncio.create_task(node.run())
                     self.tasks.append(task)
                     del schedules[node.name]
 
-            _logger.debug(f"Sleeping for {SLEEP_TIME} seconds")
-            await asyncio.sleep(SLEEP_TIME)
+                if node.name not in schedules:
+                    _logger.info(f"Scheduling {node.name} to run in {delay} seconds")
+                    schedules[node.name] = when
+
+            sleep_time = min(schedules.values()) - now
+            _logger.debug(f"Sleeping for {sleep_time:.2f} seconds")
+            await asyncio.sleep(sleep_time)
 
     def cancel(self) -> None:
         for task in self.tasks:

@@ -1,6 +1,7 @@
 import os
 import random
 from datetime import datetime
+from datetime import timezone
 from unittest import mock
 
 import pytest
@@ -69,7 +70,7 @@ async def test_postgresql(mocker) -> None:
                     ],
                 ),
                 (
-                    datetime(2021, 1, 1, 0, 0),
+                    datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
                     "hub.random",
                     mock.ANY,  # Json(0.6394267984578837)
                 ),

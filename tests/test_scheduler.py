@@ -15,6 +15,7 @@ async def test_scheduler() -> None:
     mock_source1.run.side_effect = [None, None]
     mock_source2 = mock.MagicMock()
     mock_source2.schedule = None
+    mock_source2.run = CoroutineMock()
     mock_dag = {mock_source1, mock_source2}
     vclock = aiotools.VirtualClock()
 

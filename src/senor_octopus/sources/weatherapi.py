@@ -1,6 +1,7 @@
 import logging
 import os
 from datetime import datetime
+from datetime import timezone
 
 import httpx
 from senor_octopus.lib import flatten
@@ -24,7 +25,7 @@ async def weatherapi(location: str, prefix: str = "hub.weatherapi") -> Stream:
 
     for key, value in flatten(payload["current"]).items():
         yield {
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(timezone.utc),
             "name": f"{prefix}.current.{key}",
             "value": value,
         }
@@ -32,7 +33,7 @@ async def weatherapi(location: str, prefix: str = "hub.weatherapi") -> Stream:
     tomorrow = payload["forecast"]["forecastday"][1]
     for key, value in flatten(tomorrow["day"]).items():
         yield {
-            "timestamp": datetime.utcnow(),
+            "timestamp": datetime.now(timezone.utc),
             "name": f"{prefix}.forecast.forecastday.{key}",
             "value": value,
         }

@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timezone
 from typing import List
 from typing import Union
 
@@ -20,12 +21,12 @@ async def test_crypto(mocker) -> None:
     events = [event async for event in crypto(coins)]
     assert events == [
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.crypto.BTC.USD",
             "value": 55816.61,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.crypto.AUDIO.USD",
             "value": 4.051,
         },
@@ -36,12 +37,12 @@ async def test_crypto(mocker) -> None:
     events = [event async for event in crypto(coins)]
     assert events == [
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.crypto.BTC.USD",
             "value": 55816.61,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.crypto.AUDIO.USD",
             "value": 4.051,
         },

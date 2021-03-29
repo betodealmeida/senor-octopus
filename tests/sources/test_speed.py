@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timezone
 from unittest import mock
 
 import pytest
@@ -52,22 +53,22 @@ async def test_speed(mocker) -> None:
     print(events)
     assert events == [
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.speedtest.download",
             "value": 20932433.00558606,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.speedtest.upload",
             "value": 6068322.252775613,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.speedtest.ping",
             "value": 50.377,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.speedtest.server",
             "value": {
                 "url": "http://speedtest1.st-tel.net:8080/speedtest/upload.php",
@@ -84,27 +85,27 @@ async def test_speed(mocker) -> None:
             },
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.speedtest.timestamp",
             "value": "2021-03-24T00:56:23.048266Z",
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.speedtest.bytes_sent",
             "value": 8364032,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.speedtest.bytes_received",
             "value": 26295792,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.speedtest.share",
             "value": None,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.speedtest.client",
             "value": {
                 "ip": "66.220.13.38",

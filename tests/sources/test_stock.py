@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timezone
 from typing import List
 from typing import Union
 
@@ -24,22 +25,22 @@ async def test_stock(mocker) -> None:
     events = sorted(events, key=lambda e: e["name"])
     assert events == [
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.stock.FB.current_price",
             "value": 283.02,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.stock.FB.increase_percent",
             "value": 1.54,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.stock.LYFT.current_price",
             "value": 64.51,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.stock.LYFT.increase_percent",
             "value": 1.48,
         },
@@ -50,22 +51,22 @@ async def test_stock(mocker) -> None:
     events = sorted(events, key=lambda e: e["name"])
     assert events == [
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.stock.FB.current_price",
             "value": 283.02,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.stock.FB.increase_percent",
             "value": 1.54,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.stock.LYFT.current_price",
             "value": 64.51,
         },
         {
-            "timestamp": datetime(2021, 1, 1, 0, 0),
+            "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.stock.LYFT.increase_percent",
             "value": 1.48,
         },

@@ -2,12 +2,14 @@
 Changelog
 =========
 
-Version 0.1.10 - ????-??-??
+Version 0.1.10 - 2021-03-29
 ===========================
 
-- Modified scheduler to run tasks in background
+- Modified scheduler to run tasks concurrently 
 - Modified scheduler to gracefully cancel tasks
-- New sources: Whistle, stocks, crypto
+- Added support for event-driven sources (non-scheduled)
+- New sources: Whistle, stocks, crypto, mqtt
+- New sink: mqtt
 
 Version 0.1.9 - 2021-03-25
 ==========================

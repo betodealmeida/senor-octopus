@@ -9,7 +9,7 @@ Confused? Keep reading.
 A simple example
 ================
 
-Señor Octopus reads a pipeline defintion from a configuration file like this:
+Señor Octopus reads a pipeline definition from a configuration file like this:
 
 .. code-block:: ini
 
@@ -17,7 +17,7 @@ Señor Octopus reads a pipeline defintion from a configuration file like this:
     [random]
     plugin = source.random
     flow = -> check, normal
-    schedule = * * * * *
+    schedule = * * * * *  # every minute
 
     # filter numbers from "random" that are > 0.5 and send to "high"
     [check]
@@ -37,7 +37,7 @@ Señor Octopus reads a pipeline defintion from a configuration file like this:
     flow = check ->
     level = warning
 
-The example above has a **source** called "random", that generates random numbers every minute (its ``schedule``). It's connected to 2 other nodes, "check" and "normal" (``flow = -> check, normal``). Each random number is an **event** that looks like this:
+The example above has a **source** called "random", that generates random numbers every minute (its ``schedule``). It's connected to 2 other nodes, "check" and "normal" (``flow = -> check, normal``). Each random number is sent in an **event** that looks like this:
 
 .. code-block:: json
 
@@ -69,6 +69,8 @@ To run it:
     [2021-03-25 14:28:26] INFO:senor_octopus.scheduler:Starting scheduler
     [2021-03-25 14:28:26] INFO:senor_octopus.scheduler:Scheduling random to run in 33.76353 seconds
     [2021-03-25 14:28:26] DEBUG:senor_octopus.scheduler:Sleeping for 5 seconds
+
+To stop running, press :kbd:`ctrl+C`. Any batched events will be processed before the scheduler terminates.
 
 A concrete example
 ==================
@@ -137,3 +139,22 @@ Here's another example, a pipeline that will notify you if tomorrow will rain:
     throttle = 30 minutes
     PUSHOVER_APP_TOKEN = XXX
     PUSHOVER_USER_TOKEN = johndoe
+
+Event-driven sources
+====================
+
+Señor Octopus also supports event-driven sources. Differently to the sources in the previous exammples, these sources run constantly and respond immediately to events. An example is the `MQTT <https://mqtt.org/>`_ source:
+
+.. code-block:: ini
+
+    [mqtt]
+    plugin = source.mqtt
+    flow = -> log
+    topics = test/#
+    host = mqtt.example.org
+
+    [log]
+    plugin = sink.log
+    flow = mqtt ->
+
+Running the pipeline above, when an event arrives in the MQTT topic ``test/#`` (eg, ``test/1``) it will be immediately sent to the log.

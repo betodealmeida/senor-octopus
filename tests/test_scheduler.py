@@ -29,6 +29,27 @@ async def test_scheduler() -> None:
 
 
 @pytest.mark.asyncio
+async def test_scheduler_short_long() -> None:
+    mock_source1 = mock.MagicMock()
+    mock_source1.schedule.next.return_value = 10
+    mock_source1.run = CoroutineMock()
+    mock_source1.run.side_effect = [None, None]
+    mock_source2 = mock.MagicMock()
+    mock_source2.schedule.next.return_value = 120
+    mock_source2.run = CoroutineMock()
+    mock_dag = {mock_source1, mock_source2}
+    vclock = aiotools.VirtualClock()
+
+    with vclock.patch_loop():
+        scheduler = Scheduler(mock_dag)  # type: ignore
+        with pytest.raises(Exception) as excinfo:
+            await scheduler.run()
+
+    assert str(excinfo.value) == "coroutine raised StopIteration"
+    assert len(mock_source1.run.mock_calls) == 3
+
+
+@pytest.mark.asyncio
 async def test_scheduler_cancel() -> None:
     mock_source1 = mock.MagicMock()
     mock_source1.schedule.next.return_value = 10

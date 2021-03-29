@@ -158,3 +158,13 @@ Señor Octopus also supports event-driven sources. Differently to the sources in
     flow = mqtt ->
 
 Running the pipeline above, when an event arrives in the MQTT topic ``test/#`` (eg, ``test/1``) it will be immediately sent to the log.
+
+There's also an MQTT sink, that will publish events to a given topic:
+
+.. code-block:: ini
+
+    [mqtt]
+    plugin = sink.mqtt
+    flow = * ->
+    topic = test/1
+    host = mqtt.example.org

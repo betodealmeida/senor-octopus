@@ -28,3 +28,8 @@ class FilterCallable(Protocol):
 class SinkCallable(Protocol):
     def __call__(self, stream: Stream, **kwargs: Any) -> None:
         ...  # pragma: no cover
+
+
+class LoggerCallable(Protocol):
+    def __call__(self, msg: str, *args: Any) -> None:
+        ...  # pragma: no cover

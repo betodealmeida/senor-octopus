@@ -1,5 +1,4 @@
 import asyncio
-import configparser
 import logging
 import os
 import re
@@ -48,16 +47,17 @@ class Node:
             raise Exception(f"Invalid plugin name `{plugin_name}`")
 
         # all uppercase keys are environment variables
-        for key in list(section):
+        kwargs = section.copy()
+        for key in list(kwargs):
             if re.match("[A-Z_]", key):
-                os.environ[key] = section.pop(key)
+                os.environ[key] = str(kwargs.pop(key))
 
-        flow = section.pop("flow")
+        flow = kwargs.pop("flow")
         if flow.startswith("->"):
-            return Source(name, plugin, **section)
+            return Source(name, plugin, **kwargs)
         if flow.endswith("->"):
-            return Sink(name, plugin, **section)
-        return Filter(name, plugin, **section)
+            return Sink(name, plugin, **kwargs)
+        return Filter(name, plugin, **kwargs)
 
 
 class Source(Node):
@@ -203,14 +203,16 @@ def connected(config, source, target) -> bool:
     return True
 
 
-def build_dag(config: configparser.RawConfigParser) -> Set[Source]:
-    sections = set(config.sections())
+def build_dag(config: Dict[str, Any]) -> Set[Source]:
+    sections = set(config)
     for section in sections:
         if "flow" not in config[section]:
             raise Exception("Invalid config, missing `flow` key")
 
-    sources = {name for name in sections if config[name]["flow"].startswith("->")}
-    sinks = {name for name in sections if config[name]["flow"].endswith("->")}
+    sources = {
+        name for name in sections if config[name]["flow"].strip().startswith("->")
+    }
+    sinks = {name for name in sections if config[name]["flow"].strip().endswith("->")}
     filters = sections - sources - sinks
 
     dag: Set[Source] = set()
@@ -221,7 +223,7 @@ def build_dag(config: configparser.RawConfigParser) -> Set[Source]:
         if target in seen:
             node = seen[target]
         else:
-            node = Node.build(target, dict(config[target]))
+            node = Node.build(target, config[target])
             seen[target] = node
 
         if source:

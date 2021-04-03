@@ -9,33 +9,33 @@ Confused? Keep reading.
 A simple example
 ================
 
-Señor Octopus reads a pipeline definition from a configuration file like this:
+Señor Octopus reads a pipeline definition from a YAML configuration file like this:
 
-.. code-block:: ini
+.. code-block:: yaml
 
     # generate random numbers and send them to "check" and "normal"
-    [random]
-    plugin = source.random
-    flow = -> check, normal
-    schedule = * * * * *  # every minute
+    random:
+      plugin: source.random
+      flow: -> check, normal
+      schedule: "* * * * *"  # every minute
 
     # filter numbers from "random" that are > 0.5 and send to "high"
-    [check]
-    plugin = filter.jsonpath
-    flow = random -> high
-    filter = $.events[?(@.value>0.5)]
+    check:
+      plugin: filter.jsonpath
+      flow: random -> high
+      filter: $.events[?(@.value>0.5)]
 
     # log all the numbers coming from "random" at the default level
-    [normal]
-    plugin = sink.log
-    flow = * ->
-    batch = 5 minutes
+    normal:
+      plugin: sink.log
+      flow: "* ->"
+      batch: 5 minutes
 
     # log all the numbers coming from "check" at the warning level
-    [high]
-    plugin = sink.log
-    flow = check ->
-    level = warning
+    high:
+      plugin: sink.log
+      flow: check ->
+      level: warning
 
 The example above has a **source** called "random", that generates random numbers every minute (its ``schedule``). It's connected to 2 other nodes, "check" and "normal" (``flow = -> check, normal``). Each random number is sent in an **event** that looks like this:
 
@@ -55,7 +55,7 @@ To run it:
 
 .. code-block:: bash
 
-    $ srocto config.ini -vv
+    $ srocto config.yaml -vv
     [2021-03-25 14:28:26] INFO:senor_octopus.cli:Reading configuration
     [2021-03-25 14:28:26] INFO:senor_octopus.cli:Building DAG
     [2021-03-25 14:28:26] INFO:senor_octopus.cli:
@@ -79,38 +79,38 @@ Now for a more realistic example. I wanted to monitor the air quality in my bedr
 
 This is the config I use for that:
 
-.. code-block:: ini
+.. code-block:: yaml
 
-    [awair]
-    plugin = source.awair
-    flow = -> *
-    schedule = */5 * * * *
-    prefix = hub.awair
-    AWAIR_ACCESS_TOKEN = XXX
-    AWAIR_DEVICE_TYPE = awair-element
-    AWAIR_DEVICE_ID = 12345
-    
-    [high_co2]
-    plugin = filter.jsonpath
-    flow = awair -> pushover
-    filter = $.events[?(@.name=="hub.awair.co2" and @.value>1000)]
-    
-    [pushover]
-    plugin = sink.pushover
-    flow = high_co2 ->
-    throttle = 30 minutes
-    PUSHOVER_APP_TOKEN = XXX
-    PUSHOVER_USER_TOKEN = johndoe
-    
-    [db]
-    plugin = sink.db.postgresql
-    flow = * ->
-    batch = 15 minutes
-    POSTGRES_DBNAME = dbname
-    POSTGRES_USER = user
-    POSTGRES_PASSWORD = password
-    POSTGRES_HOST = host
-    POSTGRES_PORT = 5432
+    awair:
+      plugin: source.awair
+      flow: -> *
+      schedule: "*/5 * * * *"
+      prefix: hub.awair
+      AWAIR_ACCESS_TOKEN: XXX
+      AWAIR_DEVICE_TYPE: awair-element
+      AWAIR_DEVICE_ID: 12345
+      
+    high_co2:
+      plugin: filter.jsonpath
+      flow: awair -> pushover
+      filter: $.events[?(@.name=="hub.awair.co2" and @.value>1000)]
+      
+    pushover:
+      plugin: sink.pushover
+      flow: high_co2 ->
+      throttle: 30 minutes
+      PUSHOVER_APP_TOKEN: XXX
+      PUSHOVER_USER_TOKEN: johndoe
+      
+    db:
+      plugin: sink.db.postgresql
+      flow: "* ->"
+      batch: 15 minutes
+      POSTGRES_DBNAME: dbname
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_HOST: host
+      POSTGRES_PORT: 5432
 
 I'm using `Pushover <https://pushover.net/>`_ to send notifications to my phone.
 
@@ -119,43 +119,43 @@ Will it rain?
 
 Here's another example, a pipeline that will notify you if tomorrow will rain:
 
-.. code-block:: ini
+.. code-block:: yaml
 
-    [weather]
-    plugin = source.weatherapi
-    flow = -> will_it_rain
-    schedule = 0 12 * * *
-    location = London
-    WEATHERAPI_TOKEN = XXX
+    weather:
+      plugin: source.weatherapi
+      flow: -> will_it_rain
+      schedule: 0 12 * * *
+      location: London
+      WEATHERAPI_TOKEN: XXX
 
-    [will_it_rain]
-    plugin = filter.jsonpath
-    flow = weather -> pushover
-    filter = $.events[?(@.name=="hub.weatherapi.forecast.forecastday.daily_will_it_rain" and @.value==1)]
+    will_it_rain:
+      plugin: filter.jsonpath
+      flow: weather -> pushover
+      filter: $.events[?(@.name=="hub.weatherapi.forecast.forecastday.daily_will_it_rain" and @.value==1)]
 
-    [pushover]
-    plugin = sink.pushover
-    flow = will_it_rain ->
-    throttle = 30 minutes
-    PUSHOVER_APP_TOKEN = XXX
-    PUSHOVER_USER_TOKEN = johndoe
+    pushover:
+      plugin: sink.pushover
+      flow: will_it_rain ->
+      throttle: 30 minutes
+      PUSHOVER_APP_TOKEN: XXX
+      PUSHOVER_USER_TOKEN: johndoe
 
 Event-driven sources
 ====================
 
 Señor Octopus also supports event-driven sources. Differently to the sources in the previous exammples, these sources run constantly and respond immediately to events. An example is the `MQTT <https://mqtt.org/>`_ source:
 
-.. code-block:: ini
+.. code-block:: yaml
 
-    [mqtt]
-    plugin = source.mqtt
-    flow = -> log
-    topics = test/#
-    host = mqtt.example.org
+    mqtt:
+      plugin: source.mqtt
+      flow: -> log
+      topics: test/#
+      host: mqtt.example.org
 
-    [log]
-    plugin = sink.log
-    flow = mqtt ->
+    log:
+      plugin: sink.log
+      flow: mqtt ->
 
 Running the pipeline above, when an event arrives in the MQTT topic ``test/#`` (eg, ``test/1``) it will be immediately sent to the log.
 
@@ -163,8 +163,8 @@ There's also an MQTT sink, that will publish events to a given topic:
 
 .. code-block:: ini
 
-    [mqtt]
-    plugin = sink.mqtt
-    flow = * ->
-    topic = test/1
-    host = mqtt.example.org
+    mqtt:
+      plugin: sink.mqtt
+      flow: "* ->"
+      topic: test/1
+      host: mqtt.example.org

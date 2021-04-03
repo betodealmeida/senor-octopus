@@ -1,0 +1,19 @@
+random:
+  plugin: source.random
+  flow: -> check, normal
+  schedule: "* * * * *"
+  
+check:
+  plugin: filter.jsonpath
+  flow: random -> high
+  filter: $.events[?(@.value>0.5)]
+  
+normal:
+  plugin: sink.log
+  flow: random ->
+  batch: 5 minutes
+  
+high:
+  plugin: sink.log
+  flow: check ->
+  level: warning

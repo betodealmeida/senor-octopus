@@ -33,7 +33,7 @@ async def test_format() -> None:
             rand(2),
             format_name="random number",
             format_value="{value:.2f}",
-            eval_value="false",
+            eval_value=False,
         )
     ]
     assert events == [
@@ -54,7 +54,7 @@ async def test_format() -> None:
         async for event in format(
             rand(2),
             format_value="{value:.2f}",
-            eval_value="true",
+            eval_value=True,
         )
     ]
     assert events == [

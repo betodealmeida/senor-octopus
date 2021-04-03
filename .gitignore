@@ -52,5 +52,5 @@ MANIFEST
 .venv*/
 .conda*/
 
-config.ini
+config.yaml
 venv

@@ -41,7 +41,7 @@ def test_setup_logging(mocker, capfd) -> None:
 
 @pytest.mark.asyncio
 async def test_main(mocker) -> None:
-    mocker.patch("senor_octopus.cli.CaseConfigParser")
+    mocker.patch("senor_octopus.cli.yaml")
     mocker.patch("senor_octopus.cli.build_dag")
 
     mock_scheduler = mock.MagicMock()
@@ -55,7 +55,7 @@ async def test_main(mocker) -> None:
 
 @pytest.mark.asyncio
 async def test_main_canceled(mocker) -> None:
-    mocker.patch("senor_octopus.cli.CaseConfigParser")
+    mocker.patch("senor_octopus.cli.yaml")
     mocker.patch("senor_octopus.cli.build_dag")
 
     mock_scheduler = mock.MagicMock()

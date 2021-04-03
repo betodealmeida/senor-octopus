@@ -1,9 +1,9 @@
 import argparse
 import asyncio
-import configparser
 import logging
 import sys
 
+import yaml
 from senor_octopus import __version__
 from senor_octopus.graph import build_dag
 from senor_octopus.lib import render_dag
@@ -67,18 +67,13 @@ def setup_logging(loglevel):
     )
 
 
-class CaseConfigParser(configparser.RawConfigParser):
-    def optionxform(self, optionstr):
-        return optionstr
-
-
 async def main(args):
     args = parse_args(args)
     setup_logging(args.loglevel)
 
     _logger.info("Reading configuration")
-    config = CaseConfigParser()
-    config.read(args.f)
+    with open(args.f) as fp:
+        config = yaml.load(fp)
     _logger.info("Building DAG")
     dag = build_dag(config)
     _logger.info("\n%s", render_dag(dag))

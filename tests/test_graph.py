@@ -5,8 +5,8 @@ from typing import Dict
 
 import aiotools
 import pytest
+import yaml
 from freezegun import freeze_time
-from senor_octopus.cli import CaseConfigParser
 from senor_octopus.graph import build_dag
 from senor_octopus.graph import connected
 from senor_octopus.graph import Sink
@@ -57,20 +57,19 @@ async def test_build_dag(mock_config) -> None:
 
 @pytest.mark.asyncio
 async def test_build_dag_many_to_one() -> None:
-    config = CaseConfigParser()
-    config.read_string(
+    config = yaml.load(
         """
-        [one]
-        plugin = source.random
-        flow = -> three
+one:
+  plugin: source.random
+  flow: -> three
 
-        [two]
-        plugin = source.random
-        flow = -> three
+two:
+  plugin: source.random
+  flow: -> three
 
-        [three]
-        plugin = sink.log
-        flow = * ->
+three:
+  plugin: sink.log
+  flow: "* ->"
     """,
     )
     dag = build_dag(config)
@@ -81,11 +80,10 @@ async def test_build_dag_many_to_one() -> None:
 
 
 def test_build_dag_missing_plugin() -> None:
-    config = CaseConfigParser()
-    config.read_string(
+    config = yaml.load(
         """
-        [a]
-        flow = -> *
+a:
+  flow: -> *
     """,
     )
     with pytest.raises(Exception) as excinfo:
@@ -95,31 +93,29 @@ def test_build_dag_missing_plugin() -> None:
 
 @pytest.mark.asyncio
 async def test_build_dag_seen() -> None:
-    config = CaseConfigParser()
-    config.read_string(
+    config = yaml.load(
         """
-        [a]
-        flow = -> *
-        plugin = source.random
+a:
+  flow: -> *
+  plugin: source.random
 
-        [b]
-        flow = -> *
-        plugin = source.random
+b:
+  flow: -> *
+  plugin: source.random
 
-        [c]
-        flow = * ->
-        plugin = sink.log
+c:
+  flow: "* ->"
+  plugin: sink.log
     """,
     )
     build_dag(config)
 
 
 def test_build_dag_missing_flow() -> None:
-    config = CaseConfigParser()
-    config.read_string(
+    config = yaml.load(
         """
-        [a]
-        plugin = source.random
+a:
+  plugin: source.random
     """,
     )
     with pytest.raises(Exception) as excinfo:
@@ -128,12 +124,11 @@ def test_build_dag_missing_flow() -> None:
 
 
 def test_build_dag_invalid_plugin() -> None:
-    config = CaseConfigParser()
-    config.read_string(
+    config = yaml.load(
         """
-        [a]
-        plugin = source.invalid
-        flow = -> *
+a:
+  plugin: source.invalid
+  flow: -> *
     """,
     )
     with pytest.raises(Exception) as excinfo:
@@ -145,13 +140,12 @@ def test_build_dag_environ(mocker) -> None:
     mock_env: Dict[str, str] = {}
     mocker.patch("senor_octopus.graph.os.environ", mock_env)
 
-    config = CaseConfigParser()
-    config.read_string(
+    config = yaml.load(
         """
-        [a]
-        flow = -> *
-        plugin = source.random
-        A_ENV_VAR = 1
+a:
+  flow: -> *
+  plugin: source.random
+  A_ENV_VAR: 1
     """,
     )
     build_dag(config)
@@ -182,19 +176,19 @@ async def test_batch(mocker) -> None:
     mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
     vclock = aiotools.VirtualClock()
 
-    config_content = """
-[random]
-plugin = source.random
-flow = -> log
-schedule = * * * * *
+    config = yaml.load(
+        """
+random:
+  plugin: source.random
+  flow: -> log
+  schedule: "* * * * *"
 
-[log]
-plugin = sink.log
-flow = random ->
-batch = 2 minutes
-    """
-    config = CaseConfigParser()
-    config.read_string(config_content)
+log:
+  plugin: sink.log
+  flow: random ->
+  batch: 2 minutes
+    """,
+    )
 
     with vclock.patch_loop():
         dag = build_dag(config)
@@ -213,20 +207,20 @@ async def test_batch_empty_source(mocker) -> None:
     mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
     vclock = aiotools.VirtualClock()
 
-    config_content = """
-[random]
-plugin = source.random
-flow = -> log
-schedule = * * * * *
-events = 0
+    config = yaml.load(
+        """
+random:
+  plugin: source.random
+  flow: -> log
+  schedule: "* * * * *"
+  events: 0
 
-[log]
-plugin = sink.log
-flow = random ->
-batch = 2 minutes
-    """
-    config = CaseConfigParser()
-    config.read_string(config_content)
+log:
+  plugin: sink.log
+  flow: random ->
+  batch: 2 minutes
+    """,
+    )
 
     with vclock.patch_loop():
         dag = build_dag(config)
@@ -245,20 +239,20 @@ async def test_batch_cancel(mocker) -> None:
     mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
     vclock = aiotools.VirtualClock()
 
-    config_content = """
-[random]
-plugin = source.random
-flow = -> log
-schedule = * * * * *
-events = 0
+    config = yaml.load(
+        """
+random:
+  plugin: source.random
+  flow: -> log
+  schedule: "* * * * *"
+  events: 0
 
-[log]
-plugin = sink.log
-flow = random ->
-batch = 2 minutes
-    """
-    config = CaseConfigParser()
-    config.read_string(config_content)
+log:
+  plugin: sink.log
+  flow: random ->
+  batch: 2 minutes
+    """,
+    )
 
     with vclock.patch_loop():
         dag = build_dag(config)

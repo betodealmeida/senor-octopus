@@ -20,9 +20,16 @@ from durations import Duration
 from pkg_resources import iter_entry_points
 from senor_octopus.types import Event
 from senor_octopus.types import FilterCallable
+from senor_octopus.types import LoggerCallable
 from senor_octopus.types import SinkCallable
 from senor_octopus.types import SourceCallable
 from senor_octopus.types import Stream
+
+
+async def log_events(stream: Stream, flow: str, log: LoggerCallable) -> Stream:
+    async for event in stream:
+        log("%s: %s", flow, event)
+        yield event
 
 
 class Node:
@@ -31,6 +38,7 @@ class Node:
 
         self.next: Set[Union["Filter", "Sink"]] = set()
         self._logger = logging.getLogger(name)
+        self._event_logger = logging.getLogger("senor_octopus.events")
 
     @staticmethod
     def build(name: str, section: Dict[str, Any]) -> Union["Source", "Filter", "Sink"]:
@@ -78,6 +86,11 @@ class Source(Node):
         stream = self.plugin(**self.extra_kwargs)
         async with itertools.tee(stream, n=len(self.next)) as streams:
             for node, stream in zip(self.next, streams):
+                stream = log_events(
+                    stream,
+                    f"{self.name} -> {node.name}",
+                    self._event_logger.debug,
+                )
                 await node.run(stream)
 
 
@@ -92,6 +105,11 @@ class Filter(Node):
         stream = self.plugin(stream, **self.extra_kwargs)
         async with itertools.tee(stream, n=len(self.next)) as streams:
             for node, stream in zip(self.next, streams):
+                stream = log_events(
+                    stream,
+                    f"{self.name} -> {node.name}",
+                    self._event_logger.debug,
+                )
                 await node.run(stream)
 
 

@@ -161,7 +161,7 @@ Running the pipeline above, when an event arrives in the MQTT topic ``test/#`` (
 
 There's also an MQTT sink, that will publish events to a given topic:
 
-.. code-block:: ini
+.. code-block:: yaml
 
     mqtt:
       plugin: sink.mqtt

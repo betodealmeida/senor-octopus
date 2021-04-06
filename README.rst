@@ -23,7 +23,7 @@ Señor Octopus reads a pipeline definition from a YAML configuration file like t
     check:
       plugin: filter.jsonpath
       flow: random -> high
-      filter: '$.events[?(@.value>0.5)]'
+      filter: "$.events[?(@.value>0.5)]"
 
     # log all the numbers coming from "random" at the default level
     normal:

@@ -5,6 +5,9 @@ Changelog
 Version 0.1.11 - 2021-??-??
 ===========================
 
+- Switch config to YAML
+- Log all events flowing in the DAG
+- Add docstrings to all plugins for API generation
 - New filter: format
 - New source: SQLAlchemy databases
 

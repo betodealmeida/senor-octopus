@@ -23,7 +23,7 @@ Señor Octopus reads a pipeline definition from a YAML configuration file like t
     check:
       plugin: filter.jsonpath
       flow: random -> high
-      filter: $.events[?(@.value>0.5)]
+      filter: '$.events[?(@.value>0.5)]'
 
     # log all the numbers coming from "random" at the default level
     normal:
@@ -93,7 +93,7 @@ This is the config I use for that:
     high_co2:
       plugin: filter.jsonpath
       flow: awair -> pushover
-      filter: $.events[?(@.name=="hub.awair.co2" and @.value>1000)]
+      filter: '$.events[?(@.name=="hub.awair.co2" and @.value>1000)]'
       
     pushover:
       plugin: sink.pushover
@@ -131,7 +131,7 @@ Here's another example, a pipeline that will notify you if tomorrow will rain:
     will_it_rain:
       plugin: filter.jsonpath
       flow: weather -> pushover
-      filter: $.events[?(@.name=="hub.weatherapi.forecast.forecastday.daily_will_it_rain" and @.value==1)]
+      filter: '$.events[?(@.name=="hub.weatherapi.forecast.forecastday.daily_will_it_rain" and @.value==1)]'
 
     pushover:
       plugin: sink.pushover

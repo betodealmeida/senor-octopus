@@ -30,12 +30,12 @@ async def test_sqla(mocker) -> None:
     assert events == [
         {
             "timestamp": datetime(2020, 12, 31, 0, 0, tzinfo=timezone.utc),
-            "name": "foo",
+            "name": "hub.sqla.foo",
             "value": "bar",
         },
         {
             "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
-            "name": "foo",
+            "name": "hub.sqla.foo",
             "value": "baz",
         },
     ]

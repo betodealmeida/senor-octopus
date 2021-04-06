@@ -18,6 +18,32 @@ async def mqtt(
     password: Optional[str] = None,
     prefix: str = "hub.mqtt",
 ) -> Stream:
+    """
+    Subscribe to messages on one or more MQTT topics.
+
+    This source will subscribe to one or more MQTT topics (or topic
+    wildcards), sending an event every time a message is received.
+
+    Parameters
+    ----------
+    topics
+        List of topics (or topic wildcards) to subscribe to
+    host
+        Host where the MQTT server is running
+    port
+        Port which the MQTT is listening to
+    username
+        Optional username to use when connecting to the MQTT server
+    password
+        Optional password to use when connecting to the MQTT server
+    prefix
+        Prefix for events from this source
+
+    Yields
+    ------
+    Event
+        Events with data from MQTT messages
+    """
     _logger.info("Subscribing to MQTT topics")
 
     async with Client(host, port, username=username, password=password) as client:

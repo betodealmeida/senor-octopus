@@ -1,7 +1,6 @@
 import asyncio
 import random
 from typing import cast
-from typing import Dict
 
 import aiotools
 import pytest
@@ -134,22 +133,6 @@ a:
     with pytest.raises(Exception) as excinfo:
         build_dag(config)
     assert str(excinfo.value) == "Invalid plugin name `source.invalid`"
-
-
-def test_build_dag_environ(mocker) -> None:
-    mock_env: Dict[str, str] = {}
-    mocker.patch("senor_octopus.graph.os.environ", mock_env)
-
-    config = yaml.load(
-        """
-a:
-  flow: -> *
-  plugin: source.random
-  A_ENV_VAR: 1
-    """,
-    )
-    build_dag(config)
-    assert mock_env == {"A_ENV_VAR": "1"}
 
 
 @freeze_time("2021-01-01")

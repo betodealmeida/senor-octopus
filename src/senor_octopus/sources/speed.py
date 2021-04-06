@@ -9,6 +9,22 @@ _logger = logging.getLogger(__name__)
 
 
 async def speed(prefix: str = "hub.speedtest") -> Stream:
+    """
+    Measure internet speed.
+
+    This source will measure internet speed (download, upload,
+    latency and more) by using the speedtest.net website.
+
+    Parameters
+    ----------
+    prefix
+        Prefix for events from this source
+
+    Yields
+    ------
+    Event
+        Events with internet speed data
+    """
     _logger.info("Testing internet speed")
     s = speedtest.Speedtest()
     s.get_best_server()

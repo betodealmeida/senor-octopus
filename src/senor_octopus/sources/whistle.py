@@ -1,5 +1,4 @@
 import logging
-import os
 from datetime import datetime
 from datetime import timezone
 
@@ -11,10 +10,31 @@ from senor_octopus.types import Stream
 _logger = logging.getLogger(__name__)
 
 
-async def whistle(prefix: str = "hub.whistle") -> Stream:
-    username = os.environ["WHISTLE_USERNAME"]
-    password = os.environ["WHISTLE_PASSWORD"]
+async def whistle(username: str, password: str, prefix: str = "hub.whistle") -> Stream:
+    """
+    Fetch device information and location for a Whistle pet tracker.
 
+    This source will periodically fetch device information (battery level,
+    last check-in, tracking status, battery status) and location for a
+    given Whistle pet tracker.
+
+    The location is emitted both as a pair of latitude, longitude, as well
+    as a geohash.
+
+    Parameters
+    ----------
+    username
+        Username for https://app.whistle.com/
+    password
+        Password for https://app.whistle.com/
+    prefix
+        Prefix for events from this source
+
+    Yields
+    ------
+    Event
+        Events with device information and location
+    """
     _logger.info("Fetching location from Whistle")
     async with ClientSession() as websession:
         client = Client(username, password, websession)

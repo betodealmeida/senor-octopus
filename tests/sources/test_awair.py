@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 from datetime import timezone
 
@@ -30,18 +29,10 @@ mock_payload = {
 
 
 @pytest.mark.asyncio
-async def test_awair(mocker, httpx_mock) -> None:
-    mocker.patch.dict(
-        os.environ,
-        {
-            "AWAIR_ACCESS_TOKEN": "XXX",
-            "AWAIR_DEVICE_TYPE": "awair-element",
-            "AWAIR_DEVICE_ID": "12345",
-        },
-    )
+async def test_awair(httpx_mock) -> None:
     httpx_mock.add_response(json=mock_payload)
 
-    events = [event async for event in awair()]
+    events = [event async for event in awair("XXX", 12345)]
     assert events == [
         {
             "timestamp": datetime(2021, 3, 23, 22, 26, 51, tzinfo=timezone.utc),

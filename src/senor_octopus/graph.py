@@ -1,7 +1,5 @@
 import asyncio
 import logging
-import os
-import re
 from datetime import datetime
 from datetime import timedelta
 from typing import Any
@@ -54,12 +52,7 @@ class Node:
         except StopIteration:
             raise Exception(f"Invalid plugin name `{plugin_name}`")
 
-        # all uppercase keys are environment variables
         kwargs = section.copy()
-        for key in list(kwargs):
-            if re.match("[A-Z_]", key):
-                os.environ[key] = str(kwargs.pop(key))
-
         flow = kwargs.pop("flow")
         if flow.startswith("->"):
             return Source(name, plugin, **kwargs)

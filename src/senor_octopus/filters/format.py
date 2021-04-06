@@ -14,7 +14,26 @@ async def format(
     eval_value: bool = False,
 ) -> Stream:
     """
-    Forma an event stream based on an f-string.
+    Format an event stream based using Python string formatting.
+
+    This filter will replace the name and/or value of an event
+    by formatting a string based on the original event.
+
+    Parameters
+    ----------
+    stream
+        The incoming stream of events
+    format_name
+        A string formatted with the original event that replaces the name
+    format_value
+        A string formatted with the original event that replaces the value
+    eval_value
+        Wether the new value should be evaluated
+
+    Yields
+    ------
+    Event
+        Events formatted according to the configuration
     """
     _logger.debug("Formatting events")
     async for event in stream:  # pragma: no cover

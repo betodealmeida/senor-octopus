@@ -1,0 +1,211 @@
+###########
+# Sources #
+###########
+
+# The awair source reads data from an Awair Element monitor. You need
+# to sign up at https://developer.getawair.com/console/access-token to
+# get an access token.
+#
+# Once you have the access token, you can get the ID(s) and type(s) of
+# your device(s) using curl:
+#
+#   curl --location --request GET \
+#     'https://developer-apis.awair.is/v1/users/self/devices' \
+#     --header 'Authorization: Bearer XXX'
+#
+awair:
+  plugin: source.awair
+  flow: -> *
+  schedule: 0/5 * * * *
+  access_token: XXX
+  device_id: 12345
+  device_type: awair-element
+  prefix: hub.awair
+
+# The crypto source fetches the price of cryptocurrencies from the
+# cryptocompare.com website periodically.
+crypto:
+  plugin: source.crypto
+  flow: -> *
+  schedule: 1/30 * * * *
+  coins:
+    - BTC
+    - ETH
+  currency: USD
+  prefix: hub.crypto
+
+# The MQTT source subcribes to a topic (or topic wildcard ) and
+# emits events every time a message is received.
+# 
+# Since it's event based, it should have no schedule.
+mqtt_source:
+  plugin: source.mqtt
+  flow: -> *
+  topics:
+    - foo/+
+    - bar/#
+    - baz
+  host: localhost
+  port: 1883
+  username: username
+  password: password
+  prefix: hub.mqtt
+
+# Generate random numbers between 0 and 1. This is used most for
+# testing.
+#
+# You can specify how many events are generated every time the
+# plugin runs.
+rand:
+  plugin: source.random
+  flow: -> *
+  schedule: 2/5 * * * *
+  events: 10
+  prefix: hub.random
+
+# Measure internet speed.
+#
+# This source will measure internet speed (download, upload,
+# latency and more) by using the speedtest.net website.
+speedtest:
+  plugin: source.speedtest
+  flow: -> *
+  schedule: 3/15 * * * *
+  prefix: hub.speedtest
+
+# Read data from database.
+#
+# The SQLAlchemy source periodically reads data from a database. It
+# uses a query that MUST return at least two columns: `name` and `value`.
+# Optionally, it an also return a column called `timestamp`, which will
+# be used as the timestamp of the generated event. Otherwise, the current
+# timestamp will be used.
+sqla:
+  plugin: source.sqla
+  flow: -> *
+  schedule: 4/20 * * * *
+  # See https://docs.sqlalchemy.org/en/14/core/engines.html
+  uri: postgres://user:password@host:port/db
+  # The query MUST return the columns `name` and `value`, and optionally
+  # `timestamp`.
+  sql: "SELECT dim1 AS name, COUNT(*) AS value FROM TABLE WHERE cond GROUP BY 1"
+  prefix: hub.sqla
+
+# Fetch stock price form Yahoo! Finance.
+#
+# This source will periodically retrieve the price of
+# stocks from Yahoo! Finance.
+stocks:
+  plugin: source.stock
+  flow: -> *
+  schedule: 5/10 * * * *
+  symbols:
+    - FB
+    - LYFT
+  prefix: hub.stock
+
+# The weather source fetches weather forecast data for a given location
+# (name of ZIP code). You need to sign up at https://www.weatherapi.com/my/
+# to get an access token.
+weather:
+  plugin: source.weatherapi
+  flow: -> *
+  schedule: 0 12 * * *
+  access_token: XXX
+  location: London
+  prefix: hub.weatherapi
+
+# Whistle is a pet tracker. You need to get a username and password from
+# https://app.whistle.com/.
+#
+# The source will emit events with information about the device (battery
+# level, last check-in, tracking status, battery status), as well as its
+# location. The location is emitted as a latitude, longitude pair, as well
+# as a geohash.
+whistle:
+  plugin: source.whistle
+  flow: -> *
+  schedule: 6/15 * * * *
+  username: user@example.com
+  password: XXX
+  prefix: hub.whistle
+
+###########
+# Filters #
+###########
+
+# The format filter replaces the name or value of an incoming event
+# by applying string formatting to it.
+format:
+  plugin: filter.format
+  flow: * -> *
+  # Wraps the original name in a warning message
+  format_name: "Warning ({name})"
+  # Reduce precision of value to 2 decimalas
+  format_value: "{value:.2f}"
+  # Evaluate values, eg, casting from string to float
+  eval_value: true
+
+# The JSON Path filter will drop events that don't match a JSON Path
+# expression. It's useful for routing events that match a particular
+# criteria to a specific sink, eg, for notifications.
+jpath:
+  plugin: filter.jsonpath
+  flow: random -> alert
+  # Pass only events from random with value > 0.5
+  filter: '$.events[?(@.name=="hub.random" and @.value>0.5)]'
+
+#########
+# Sinks #
+#########
+
+# The log sink will log incoming events, with a configurable
+# level.
+log:
+  plugin: sink.log
+  flow: * ->
+  level = info
+
+# The MQTT sink is used to send events to an MQTT topic.
+mqtt_sink:
+  plugin: sink.mqtt
+  flow: * ->
+  topic: test/1
+  host: localhost
+  port: 1883
+  username: username
+  password: password
+  # Quality of Service (QoS) level:
+  #   0: At most once
+  #   1: At least once
+  #   2: Exactly once
+  qos: 1
+
+# The Pushover sink uses the pushover.net mobile application
+# to send notifications to a smartphone.
+#
+# You need to sign up for their API (https://pushover.net/api).
+pushover:
+  plugin: sink.pushover
+  flow: * ->
+  # Throttle will ensure that notifications are sent at most once
+  # in a given time window. It can be used with any sink.
+  throttle: 30 minutes
+  app_token: XXX
+  user_token: YYY
+
+# The Postgres sink can be used to write events into a database.
+postgres:
+  plugin: sink.db.postgresql
+  flow: * ->
+  # Batch will store all events in a queue until for a given time,
+  # and then process all of them at once. Queued events are 
+  # processed if the application is termined gracefully. This
+  # option can be used with any sink.
+  batch: 5 minutes
+  user: username
+  password: password
+  host: localhost
+  port: 5432
+  dbname: dbname
+  table: events

@@ -1,5 +1,4 @@
 import logging
-import os
 from datetime import datetime
 from datetime import timezone
 
@@ -10,12 +9,34 @@ from senor_octopus.types import Stream
 _logger = logging.getLogger(__name__)
 
 
-async def weatherapi(location: str, prefix: str = "hub.weatherapi") -> Stream:
-    token = os.environ["WEATHERAPI_TOKEN"]
+async def weatherapi(
+    access_token: str,
+    location: str,
+    prefix: str = "hub.weatherapi",
+) -> Stream:
+    """
+    Fetch weather forecast data from weatherapi.com.
 
+    This source will periodically retrieve weather forecast
+    data from weatherapi.com for a given location.
+
+    Parameters
+    ----------
+    access_token
+        Access token from https://www.weatherapi.com/my/.
+    location
+        Location name or ZIP code
+    prefix
+        Prefix for events from this source
+
+    Yields
+    ------
+    Event
+        Events with weather forecast data
+    """
     _logger.info("Fetching weather data")
     url = (
-        f"http://api.weatherapi.com/v1/forecast.json?key={token}"
+        f"http://api.weatherapi.com/v1/forecast.json?key={access_token}"
         f"&q={location}&days=2&aqi=no&alerts=no"
     )
     async with httpx.AsyncClient() as client:

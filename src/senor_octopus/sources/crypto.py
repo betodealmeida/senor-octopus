@@ -14,6 +14,26 @@ async def crypto(
     currency: str = "USD",
     prefix: str = "hub.crypto",
 ) -> Stream:
+    """
+    Fetch price of cryptocurrencies from cryptocompare.com.
+
+    This source will periodically retrieve the price of
+    cryptocurrencies from the cryptocompare.com website.
+
+    Parameters
+    ----------
+    coins
+        List of cryptocurrency symbols
+    currency
+        Currency used to display price
+    prefix
+        Prefix for events from this source
+
+    Yields
+    ------
+    Event
+        Events with price of cryptocurrencies
+    """
     _logger.info("Fetching crypto data")
 
     for coin in coins:

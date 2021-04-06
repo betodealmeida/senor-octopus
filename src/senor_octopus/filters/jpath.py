@@ -9,6 +9,21 @@ _logger = logging.getLogger(__name__)
 async def jsonpath(stream: Stream, filter: str) -> Stream:
     """
     Filter event stream based on a JSON path.
+
+    This filter can be used to filter events based on their
+    name and value, allowing events to be dynamically routed.
+
+    Parameters
+    ----------
+    stream
+        The incoming stream of events
+    filter
+        A JSON Path expression used to filter events
+
+    Yields
+    ------
+    Event
+        Events filtered by the JSON Path expression
     """
     _logger.debug("Filtering events")
     events = [event async for event in stream]

@@ -14,14 +14,10 @@ with open(os.path.join(dirname, "weatherapi_response.json")) as fp:
 
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
-async def test_weatherapi(mocker, httpx_mock) -> None:
-    mocker.patch.dict(
-        os.environ,
-        {"WEATHERAPI_TOKEN": "XXX"},
-    )
+async def test_weatherapi(httpx_mock) -> None:
     httpx_mock.add_response(json=mock_payload)
 
-    events = [event async for event in weatherapi("iceland")]
+    events = [event async for event in weatherapi("XXX", "iceland")]
     assert events == [
         {
             "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),

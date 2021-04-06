@@ -1,5 +1,4 @@
 import logging
-import os
 
 import httpx
 from senor_octopus.types import Stream
@@ -7,10 +6,22 @@ from senor_octopus.types import Stream
 _logger = logging.getLogger(__name__)
 
 
-async def pushover(stream: Stream) -> None:
-    app_token = os.environ["PUSHOVER_APP_TOKEN"]
-    user_token = os.environ["PUSHOVER_USER_TOKEN"]
+async def pushover(stream: Stream, app_token: str, user_token: str) -> None:
+    """
+    Send events to the Pushover mobile app.
 
+    This sink can be used to send events to a smartphone, using
+    the Pushover (pushover.net) application.
+
+    Parameters
+    ----------
+    stream
+        The incoming stream of events
+    app_token
+        The application token (https://pushover.net/api)
+    user_token
+        The user token (https://pushover.net/api)
+    """
     url = "https://api.pushover.net/1/messages.json"
     async for event in stream:  # pragma: no cover
         _logger.debug(event)

@@ -10,6 +10,24 @@ _logger = logging.getLogger(__name__)
 
 
 async def stock(symbols: List[str], prefix: str = "hub.stock") -> Stream:
+    """
+    Fetch stock price form Yahoo! Finance.
+
+    This source will periodically retrieve the price of
+    stocks from Yahoo! Finance.
+
+    Parameters
+    ----------
+    symbols
+        List of stock symbols
+    prefix
+        Prefix for events from this source
+
+    Yields
+    ------
+    Event
+        Events with price of stocks
+    """
     _logger.info("Fetching stock data")
 
     for symbol in symbols:

@@ -1,4 +1,3 @@
-import os
 import random
 from datetime import datetime
 from datetime import timezone
@@ -15,16 +14,6 @@ from senor_octopus.sources.rand import rand
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_postgresql(mocker) -> None:
-    mocker.patch.dict(
-        os.environ,
-        {
-            "POSTGRES_DBNAME": "dbname",
-            "POSTGRES_HOST": "localhost",
-            "POSTGRES_PORT": "5432",
-            "POSTGRES_USER": "user",
-            "POSTGRES_PASSWORD": "XXX",
-        },
-    )
     mock_aiopg = CoroutineMock()
     mock_cursor = (
         mock_aiopg.create_pool.return_value.__aenter__.return_value.acquire.return_value.__aenter__.return_value.cursor.return_value.__aenter__.return_value
@@ -33,7 +22,7 @@ async def test_postgresql(mocker) -> None:
     mocker.patch("senor_octopus.sinks.db.postgresql.aiopg", mock_aiopg)
     random.seed(42)
 
-    await postgresql(rand(1))
+    await postgresql(rand(1), "user", "password", "host", 5432, "dbname")
 
     mock_cursor.execute.assert_has_calls(
         [
@@ -81,16 +70,6 @@ async def test_postgresql(mocker) -> None:
 
 @pytest.mark.asyncio
 async def test_postgresql_empty_stream(mocker) -> None:
-    mocker.patch.dict(
-        os.environ,
-        {
-            "POSTGRES_DBNAME": "dbname",
-            "POSTGRES_HOST": "localhost",
-            "POSTGRES_PORT": "5432",
-            "POSTGRES_USER": "user",
-            "POSTGRES_PASSWORD": "XXX",
-        },
-    )
     mock_aiopg = CoroutineMock()
     mock_cursor = (
         mock_aiopg.create_pool.return_value.__aenter__.return_value.acquire.return_value.__aenter__.return_value.cursor.return_value.__aenter__.return_value
@@ -99,5 +78,5 @@ async def test_postgresql_empty_stream(mocker) -> None:
     mocker.patch("senor_octopus.sinks.db.postgresql.aiopg", mock_aiopg)
     random.seed(42)
 
-    await postgresql(rand(0))
+    await postgresql(rand(0), "user", "password", "host", 5432, "dbname")
     assert len(mock_cursor.execute.mock_calls) == 2

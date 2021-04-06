@@ -1,5 +1,4 @@
 import logging
-import os
 import textwrap
 
 import aiopg
@@ -10,13 +9,39 @@ from senor_octopus.types import Stream
 _logger = logging.getLogger(__name__)
 
 
-async def postgresql(stream: Stream, table: str = "events") -> None:
-    dbname = os.environ["POSTGRES_DBNAME"]
-    host = os.environ["POSTGRES_HOST"]
-    port = os.environ["POSTGRES_PORT"]
-    user = os.environ["POSTGRES_USER"]
-    password = os.environ["POSTGRES_PASSWORD"]
+async def postgresql(
+    stream: Stream,
+    user: str,
+    password: str,
+    host: str,
+    port: int,
+    dbname: str,
+    table: str = "events",
+) -> None:
+    """
+    Write events into a Postgres database.
 
+    This sink can be used to write events into a Postgres database.
+    It will create a table with 3 columns, `timestamp`, `name` and
+    `event`, where to events will be stored.
+
+    Parameters
+    ----------
+    stream
+        The incoming stream of events
+    user
+        The username to use when connecting to the DB
+    password
+        The password to use when connecting to the DB
+    host
+        Host where the database is running
+    post
+        Port which the database is listening to
+    dbname
+        Name of the database to connect to
+    table
+        Name of the table where the events will be stored
+    """
     dsn = f"dbname={dbname} user={user} password={password} host={host} port={port}"
     async with aiopg.create_pool(dsn) as pool:
         async with pool.acquire() as conn:

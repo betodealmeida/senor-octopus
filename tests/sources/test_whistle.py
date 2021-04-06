@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 from datetime import timezone
 
@@ -103,21 +102,14 @@ mock_payload = {
 
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
-async def test_whistle(mocker) -> None:
-    mocker.patch.dict(
-        os.environ,
-        {
-            "WHISTLE_USERNAME": "user@example.com",
-            "WHISTLE_PASSWORD": "XXX",
-        },
-    )
+async def test_whistle() -> None:
     with aioresponses() as mock_response:
         mock_response.post(
             "https://app.whistle.com/api/login",
             payload={"auth_token": "XXX"},
         )
         mock_response.get("https://app.whistle.com/api/pets", payload=mock_payload)
-        events = [event async for event in whistle()]
+        events = [event async for event in whistle("username", "password")]
 
     print(sorted(events, key=lambda e: e["name"]))
     assert sorted(events, key=lambda e: e["name"]) == [

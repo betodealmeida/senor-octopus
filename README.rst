@@ -143,7 +143,7 @@ Here's another example, a pipeline that will notify you if tomorrow will rain:
 Event-driven sources
 ====================
 
-Señor Octopus also supports event-driven sources. Differently to the sources in the previous exammples, these sources run constantly and respond immediately to events. An example is the `MQTT <https://mqtt.org/>`_ source:
+Señor Octopus also supports event-driven sources. Differently to the sources in the previous examples, these sources run constantly and respond immediately to events. An example is the `MQTT <https://mqtt.org/>`_ source:
 
 .. code-block:: yaml
 

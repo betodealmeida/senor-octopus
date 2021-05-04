@@ -10,6 +10,7 @@ Version 0.1.11 - 2021-??-??
 - Add docstrings to all plugins for API generation
 - New filter: format
 - New source: SQLAlchemy databases
+- Fix schedule with only event sources
 
 Version 0.1.10 - 2021-03-29
 ===========================

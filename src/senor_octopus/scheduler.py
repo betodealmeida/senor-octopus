@@ -47,7 +47,7 @@ class Scheduler:
                     _logger.info(f"Scheduling {node.name} to run in {delay} seconds")
                     schedules[node.name] = when
 
-            sleep_time = min(schedules.values()) - now
+            sleep_time = min(schedules.values()) - now if schedules else 3600
             _logger.debug(f"Sleeping for {sleep_time:.2f} seconds")
             await asyncio.sleep(sleep_time)
 

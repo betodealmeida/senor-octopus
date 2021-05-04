@@ -86,9 +86,9 @@ This is the config I use for that:
       flow: -> *
       schedule: "*/5 * * * *"
       prefix: hub.awair
-      AWAIR_ACCESS_TOKEN: XXX
-      AWAIR_DEVICE_TYPE: awair-element
-      AWAIR_DEVICE_ID: 12345
+      access_token: XXX
+      device_type: awair-element
+      device_id: 12345
       
     high_co2:
       plugin: filter.jsonpath
@@ -99,18 +99,18 @@ This is the config I use for that:
       plugin: sink.pushover
       flow: high_co2 ->
       throttle: 30 minutes
-      PUSHOVER_APP_TOKEN: XXX
-      PUSHOVER_USER_TOKEN: johndoe
+      app_token: XXX
+      user_token: johndoe
       
     db:
       plugin: sink.db.postgresql
       flow: "* ->"
       batch: 15 minutes
-      POSTGRES_DBNAME: dbname
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_HOST: host
-      POSTGRES_PORT: 5432
+      dbname: dbname
+      user: user
+      password: password
+      host: host
+      port: 5432
 
 I'm using `Pushover <https://pushover.net/>`_ to send notifications to my phone.
 
@@ -126,7 +126,7 @@ Here's another example, a pipeline that will notify you if tomorrow will rain:
       flow: -> will_it_rain
       schedule: 0 12 * * *
       location: London
-      WEATHERAPI_TOKEN: XXX
+      access_token: XXX
 
     will_it_rain:
       plugin: filter.jsonpath
@@ -137,8 +137,8 @@ Here's another example, a pipeline that will notify you if tomorrow will rain:
       plugin: sink.pushover
       flow: will_it_rain ->
       throttle: 30 minutes
-      PUSHOVER_APP_TOKEN: XXX
-      PUSHOVER_USER_TOKEN: johndoe
+      app_token: XXX
+      user_token: johndoe
 
 Event-driven sources
 ====================

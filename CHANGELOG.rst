@@ -2,7 +2,7 @@
 Changelog
 =========
 
-Version 0.1.11 - 2021-??-??
+Version 0.1.11 - 2021-05-05
 ===========================
 
 - Switch config to YAML
@@ -11,6 +11,7 @@ Version 0.1.11 - 2021-??-??
 - New filter: format
 - New source: SQLAlchemy databases
 - Fix schedule with only event sources
+- Fix multiple topics in mqtt source
 
 Version 0.1.10 - 2021-03-29
 ===========================

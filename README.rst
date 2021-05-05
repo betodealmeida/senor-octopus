@@ -70,7 +70,7 @@ To run it:
     [2021-03-25 14:28:26] INFO:senor_octopus.scheduler:Scheduling random to run in 33.76353 seconds
     [2021-03-25 14:28:26] DEBUG:senor_octopus.scheduler:Sleeping for 5 seconds
 
-To stop running, press :kbd:`ctrl+C`. Any batched events will be processed before the scheduler terminates.
+To stop running, press ``ctrl+C``. Any batched events will be processed before the scheduler terminates.
 
 A concrete example
 ==================

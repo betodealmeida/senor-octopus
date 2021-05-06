@@ -130,6 +130,13 @@ whistle:
   password: XXX
   prefix: hub.whistle
 
+# Send a "sunrise" or "sunset" event
+sun:
+  plugin: source.sun
+  flow: -> *
+  latitude: 38.3
+  longitude: -123.0
+
 ###########
 # Filters #
 ###########

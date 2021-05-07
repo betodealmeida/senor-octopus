@@ -31,15 +31,18 @@ async def log_events(stream: Stream, flow: str, log: LoggerCallable) -> Stream:
 
 
 class Node:
-    def __init__(self, name: str):
-        self.name = name
+    def __init__(self, node_name: str):
+        self.name = node_name
 
         self.next: Set[Union["Filter", "Sink"]] = set()
-        self._logger = logging.getLogger(name)
+        self._logger = logging.getLogger(node_name)
         self._event_logger = logging.getLogger("senor_octopus.events")
 
     @staticmethod
-    def build(name: str, section: Dict[str, Any]) -> Union["Source", "Filter", "Sink"]:
+    def build(
+        node_name: str,
+        section: Dict[str, Any],
+    ) -> Union["Source", "Filter", "Sink"]:
         # load plugin
         try:
             plugin_name = section.pop("plugin")
@@ -55,21 +58,21 @@ class Node:
         kwargs = section.copy()
         flow = kwargs.pop("flow")
         if flow.startswith("->"):
-            return Source(name, plugin, **kwargs)
+            return Source(node_name, plugin, **kwargs)
         if flow.endswith("->"):
-            return Sink(name, plugin, **kwargs)
-        return Filter(name, plugin, **kwargs)
+            return Sink(node_name, plugin, **kwargs)
+        return Filter(node_name, plugin, **kwargs)
 
 
 class Source(Node):
     def __init__(
         self,
-        name: str,
+        node_name: str,
         plugin: SourceCallable,
         schedule: Optional[str] = None,
         **extra_kwargs: Any,
     ):
-        super().__init__(name)
+        super().__init__(node_name)
         self.plugin = plugin
         self.schedule = CronTab(schedule) if schedule else None
         self.extra_kwargs = extra_kwargs
@@ -88,8 +91,8 @@ class Source(Node):
 
 
 class Filter(Node):
-    def __init__(self, name: str, plugin: FilterCallable, **extra_kwargs: Any):
-        super().__init__(name)
+    def __init__(self, node_name: str, plugin: FilterCallable, **extra_kwargs: Any):
+        super().__init__(node_name)
         self.plugin = plugin
         self.extra_kwargs = extra_kwargs
 
@@ -109,13 +112,13 @@ class Filter(Node):
 class Sink(Node):
     def __init__(
         self,
-        name: str,
+        node_name: str,
         plugin: SinkCallable,
         throttle: Optional[str] = None,
         batch: Optional[str] = None,
         **extra_kwargs: Any,
     ):
-        super().__init__(name)
+        super().__init__(node_name)
         self.plugin = plugin
         self.throttle = (
             timedelta(seconds=Duration(throttle).to_seconds()) if throttle else None
@@ -132,7 +135,7 @@ class Sink(Node):
         if (
             self.last_run is not None
             and self.throttle
-            and datetime.utcnow() - self.last_run < self.throttle
+            and datetime.utcnow() - self.last_run <= self.throttle
         ):
             self._logger.info(
                 "Last run was %s, skipping this one due to throttle",

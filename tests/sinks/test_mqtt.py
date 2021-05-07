@@ -4,8 +4,6 @@ import pytest
 from senor_octopus.sinks.mqtt import mqtt
 from senor_octopus.sources.rand import rand
 
-messages = [0, 1, 2]
-
 
 @pytest.mark.asyncio
 async def test_mqtt(mocker) -> None:

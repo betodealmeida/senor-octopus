@@ -85,9 +85,8 @@ def test_interrupt(mocker) -> None:
     mock_main.side_effect = KeyboardInterrupt()
     mocker.patch("senor_octopus.cli.main", mock_main)
     mocker.patch("senor_octopus.cli.sys.argv", ["srocto", "config.yaml", "-vv"])
-    mock_logger = mocker.MagicMock()
-    mocker.patch("senor_octopus.cli._logger", mock_logger)
+    mock_logger = mocker.patch("senor_octopus.cli._logger")
 
     run()
 
-    assert mock_logger.info.called_with("Stopping Sr. Octopus")
+    mock_logger.info.assert_called_with("Stopping Sr. Octopus")

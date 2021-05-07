@@ -38,17 +38,17 @@ class Scheduler:
                 when = now + delay
 
                 if node.name in schedules and schedules[node.name] <= now:
-                    _logger.info(f"Running {node.name}")
+                    _logger.info("Running %s", node.name)
                     task = asyncio.create_task(node.run())
                     self.tasks.append(task)
                     del schedules[node.name]
 
                 if node.name not in schedules:
-                    _logger.info(f"Scheduling {node.name} to run in {delay} seconds")
+                    _logger.info("Scheduling %s to run in %d seconds", node.name, delay)
                     schedules[node.name] = when
 
             sleep_time = min(schedules.values()) - now if schedules else 3600
-            _logger.debug(f"Sleeping for {sleep_time:.2f} seconds")
+            _logger.debug("Sleeping for %d seconds", sleep_time)
             await asyncio.sleep(sleep_time)
 
     def cancel(self) -> None:

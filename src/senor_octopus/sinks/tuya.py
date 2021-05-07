@@ -1,5 +1,5 @@
 import logging
-from functools import cache
+from functools import lru_cache
 
 from senor_octopus.types import Stream
 from tuyapy import TuyaApi
@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 api = TuyaApi()
 
 
-@cache
+@lru_cache(maxsize=None)
 def authenticate(email: str, password: str, country: str, application: str) -> None:
     _logger.debug("Authenticating")
     api.init(email, password, country, application)

@@ -5,7 +5,7 @@ Changelog
 Version 0.1.12 - 2021-MM-DD
 ===========================
 
-- New source: suntime
+- New sources: suntime, static
 - New sink: Tuya/Smart Life
 
 Version 0.1.11 - 2021-05-05

@@ -1,5 +1,13 @@
 # Turn on lights at sunset, turn off at 10:30p
+#
 # Author: Beto Dealmeida <roberto@dealmeida.net>
+#
+#   * sun
+#   | * turn_off
+#   * | sunset
+#   * | turn_on
+#   |/
+#   * lights
 
 # Sunset is determined based on latitude and longitude
 sun:

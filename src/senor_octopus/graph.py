@@ -127,7 +127,6 @@ class Sink(Node):
         self.extra_kwargs = extra_kwargs
 
         self.last_run: Optional[datetime] = None
-        self.last_batch_start: Optional[float] = None
         self.queue: asyncio.Queue = asyncio.Queue()
         self.task = asyncio.create_task(self.worker())
 
@@ -166,17 +165,17 @@ class Sink(Node):
         while not canceled:
             # consume queue into a new stream
             stream: List[Event] = []
-            self.last_batch_start = None
+            batch_start: Optional[float] = None
             while True:
                 now = loop.time()
 
                 timeout: Optional[float]
-                if self.last_batch_start is None:
+                if batch_start is None:
                     # batch hasn't started, we can wait forever on a new event
                     timeout = None
                 else:
                     # wait on new event while the batch lasts
-                    timeout = self.last_batch_start + self.batch - now
+                    timeout = batch_start + self.batch - now
 
                 try:
                     event = await asyncio.wait_for(self.queue.get(), timeout)
@@ -190,9 +189,9 @@ class Sink(Node):
                     break
 
                 # first event in a batch?
-                if self.last_batch_start is None:
+                if batch_start is None:
                     self._logger.info("Received event, starting a new batch")
-                    self.last_batch_start = loop.time()
+                    batch_start = loop.time()
 
                 stream.append(event)
                 self.queue.task_done()

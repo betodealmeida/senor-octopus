@@ -2,12 +2,13 @@
 Changelog
 =========
 
-Version 0.1.12 - 2021-MM-DD
+Version 0.1.12 - 2021-05-08
 ===========================
 
 - New sources: suntime, static
 - New sink: Tuya/Smart Life
 - Format plugin parameters simplified
+- Fix jsonpath filter to work with event streams
 
 Version 0.1.11 - 2021-05-05
 ===========================

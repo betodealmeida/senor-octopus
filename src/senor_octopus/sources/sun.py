@@ -50,7 +50,7 @@ async def sun(
         _logger.debug("Next sunset: %s", next_sunset)
 
         if now < next_sunrise:
-            _logger.debug("Waiting on today's sunrise")
+            _logger.debug("Waiting for today's sunrise")
             await asyncio.sleep((next_sunrise - now).total_seconds())
             yield {
                 "timestamp": next_sunrise.astimezone(timezone.utc),
@@ -58,7 +58,7 @@ async def sun(
                 "value": "sunrise",
             }
         elif now < next_sunset:
-            _logger.debug("Waiting on today's sunset")
+            _logger.debug("Waiting for today's sunset")
             await asyncio.sleep((next_sunset - now).total_seconds())
             yield {
                 "timestamp": next_sunset.astimezone(timezone.utc),
@@ -66,7 +66,7 @@ async def sun(
                 "value": "sunset",
             }
         else:
-            _logger.debug("Waiting on tomorrow's sunrise")
+            _logger.debug("Waiting for tomorrow's sunrise")
             tomorrow = reference + timedelta(days=1)
             next_sunrise = info.get_local_sunrise_time(tomorrow)
             await asyncio.sleep((next_sunrise - now).total_seconds())

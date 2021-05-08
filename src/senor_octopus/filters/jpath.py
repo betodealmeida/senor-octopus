@@ -26,6 +26,7 @@ async def jsonpath(stream: Stream, filter: str) -> Stream:
         Events filtered by the JSON Path expression
     """
     _logger.debug("Filtering events")
-    events = [event async for event in stream]
-    for event in JSONPath(filter).parse({"events": events}):
-        yield event
+    parser = JSONPath(filter)
+    async for event in stream:  # pragma: no cover
+        if parser.parse({"events": [event]}):
+            yield event

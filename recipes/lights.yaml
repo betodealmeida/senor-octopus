@@ -1,0 +1,41 @@
+# Turn on lights at sunset, turn off at 10:30p
+# Author: Beto Dealmeida <roberto@dealmeida.net>
+
+# Sunset is determined based on latitude and longitude
+sun:
+  plugin: source.sun
+  flow: -> sunset
+  latitude: 38.3
+  longitude: -123.0
+
+# Filter sunset events only, since the `sun` source will emit
+# both "sunrise" and "sunset" events
+sunset:
+  plugin: filter.jsonpath
+  flow: sun -> turn_on
+  filter: '$.events[?(@.name=="hub.sun" and @.value=="sunset")]'
+
+# Transform the event into one that will turn on the lights
+turn_on:
+  plugin: filter.format
+  flow: sunset -> lights
+  name: "turn"
+  value: "on"
+
+# At 10:30p send an event to turn off the lights
+turn_off:
+  plugin: source.static
+  flow: -> lights
+  schedule: 30 22 * * *
+  name: "turn"
+  value: "off"
+
+# This controls a smart switch that works with the Smart Life app
+lights:
+  plugin: sink.tuya
+  flow: turn_on, turn_off ->
+  device: "Porch lights"
+  email: user@example.com
+  password: XXX
+  country: "1"
+  application: smart_life

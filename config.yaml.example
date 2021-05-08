@@ -147,9 +147,9 @@ format:
   plugin: filter.format
   flow: * -> *
   # Wraps the original name in a warning message
-  format_name: "Warning ({name})"
+  name: "Warning ({name})"
   # Reduce precision of value to 2 decimalas
-  format_value: "{value:.2f}"
+  value: "{value:.2f}"
   # Evaluate values, eg, casting from string to float
   eval_value: true
 

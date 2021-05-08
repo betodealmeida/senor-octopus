@@ -9,8 +9,8 @@ _logger = logging.getLogger(__name__)
 
 async def format(
     stream: Stream,
-    format_name: Optional[str] = None,
-    format_value: Optional[str] = None,
+    name: Optional[str] = None,
+    value: Optional[str] = None,
     eval_value: bool = False,
 ) -> Stream:
     """
@@ -23,9 +23,9 @@ async def format(
     ----------
     stream
         The incoming stream of events
-    format_name
+    name
         A string formatted with the original event that replaces the name
-    format_value
+    value
         A string formatted with the original event that replaces the value
     eval_value
         Wether the new value should be evaluated
@@ -38,10 +38,10 @@ async def format(
     _logger.debug("Formatting events")
     async for event in stream:  # pragma: no cover
         event = event.copy()
-        if format_name:
-            event["name"] = format_name.format(**event)
-        if format_value:
-            event["value"] = format_value.format(**event)
+        if name:
+            event["name"] = name.format(**event)
+        if value:
+            event["value"] = value.format(**event)
         if eval_value:
             event["value"] = ast.literal_eval(event["value"])
 

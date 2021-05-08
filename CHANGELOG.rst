@@ -7,6 +7,7 @@ Version 0.1.12 - 2021-MM-DD
 
 - New sources: suntime, static
 - New sink: Tuya/Smart Life
+- Format plugin parameters simplified
 
 Version 0.1.11 - 2021-05-05
 ===========================

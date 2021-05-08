@@ -31,8 +31,8 @@ async def test_format() -> None:
         event
         async for event in format(
             rand(2),
-            format_name="random number",
-            format_value="{value:.2f}",
+            name="random number",
+            value="{value:.2f}",
             eval_value=False,
         )
     ]
@@ -53,7 +53,7 @@ async def test_format() -> None:
         event
         async for event in format(
             rand(2),
-            format_value="{value:.2f}",
+            value="{value:.2f}",
             eval_value=True,
         )
     ]

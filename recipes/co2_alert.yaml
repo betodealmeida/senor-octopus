@@ -1,0 +1,31 @@
+# Send phone notification if CO2 > 1000 ppm
+#
+# Author: Beto Dealmeida <roberto@dealmeida.net>
+#
+#   * awair
+#   * high_co2
+#   * pushover
+
+# This reads air quality data from an Awair Element sensor
+awair:
+  plugin: source.awair
+  flow: -> high_co2
+  schedule: 0/10 * * * *
+  prefix: hub.awair
+  access_token: XXX
+  device_type: awair-element
+  device_id: 12345
+
+# Filter events where CO2 > 1000 ppm
+high_co2:
+  plugin: filter.jsonpath
+  flow: awair -> pushover
+  filter: '$.events[?(@.name=="hub.awair.co2" and @.value>1000)]'
+
+# Send notification to the Pushover app
+pushover:
+  plugin: sink.pushover
+  flow: high_co2 ->
+  throttle: 30 minutes
+  app_token: XXX
+  user_token: XXX

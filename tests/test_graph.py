@@ -138,8 +138,7 @@ a:
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_run_source(mocker, mock_config) -> None:
-    mock_logger = mocker.MagicMock()
-    mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
+    mock_logger = mocker.patch("senor_octopus.sinks.log._logger")
     random.seed(42)
 
     dag = build_dag(mock_config)
@@ -155,8 +154,7 @@ async def test_run_source(mocker, mock_config) -> None:
 
 @pytest.mark.asyncio
 async def test_batch(mocker) -> None:
-    mock_logger = mocker.MagicMock()
-    mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
+    mock_logger = mocker.patch("senor_octopus.sinks.log._logger")
     vclock = aiotools.VirtualClock()
 
     config = yaml.load(
@@ -186,8 +184,7 @@ log:
 
 @pytest.mark.asyncio
 async def test_batch_empty_source(mocker) -> None:
-    mock_logger = mocker.MagicMock()
-    mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
+    mock_logger = mocker.patch("senor_octopus.sinks.log._logger")
     vclock = aiotools.VirtualClock()
 
     config = yaml.load(
@@ -214,6 +211,82 @@ log:
 
         await asyncio.sleep(180)
         assert len(mock_logger.log.mock_calls) == 0
+
+
+@pytest.mark.asyncio
+async def test_throttle(mocker) -> None:
+    _logger = mocker.patch("senor_octopus.sinks.log._logger")
+    vclock = aiotools.VirtualClock()
+
+    config = yaml.load(
+        """
+random:
+  plugin: source.random
+  flow: -> log
+  schedule: "* * * * *"
+  events: 1
+
+log:
+  plugin: sink.log
+  flow: random ->
+  throttle: 2 minutes
+    """,
+    )
+
+    with vclock.patch_loop():
+        dag = build_dag(config)
+        source = dag.pop()
+        sink = list(source.next)[0]
+
+        sink = cast(Sink, sink)
+        assert sink.last_run is None
+
+        await source.run()
+        assert len(_logger.log.mock_calls) == 1
+        assert sink.last_run == 0.0
+
+        await asyncio.sleep(60)
+        await source.run()
+        assert len(_logger.log.mock_calls) == 1
+        assert sink.last_run == 0.0
+
+        await asyncio.sleep(150)
+        await source.run()
+        assert len(_logger.log.mock_calls) == 2
+        assert sink.last_run == 210.0
+
+
+@pytest.mark.asyncio
+async def test_throttle_without_events(mocker) -> None:
+    _logger = mocker.patch("senor_octopus.sinks.log._logger")
+    vclock = aiotools.VirtualClock()
+
+    config = yaml.load(
+        """
+random:
+  plugin: source.random
+  flow: -> log
+  schedule: "* * * * *"
+  events: 0
+
+log:
+  plugin: sink.log
+  flow: random ->
+  throttle: 2 minutes
+    """,
+    )
+
+    with vclock.patch_loop():
+        dag = build_dag(config)
+        source = dag.pop()
+        sink = list(source.next)[0]
+
+        sink = cast(Sink, sink)
+        assert sink.last_run is None
+
+        await source.run()
+        assert len(_logger.log.mock_calls) == 0
+        assert sink.last_run is None
 
 
 @pytest.mark.asyncio

@@ -1,7 +1,10 @@
+import asyncio
+from asyncio.futures import Future
 from io import StringIO
 from typing import Any
 from typing import Dict
 from typing import List
+from typing import Optional
 from typing import Set
 from typing import Tuple
 from typing import Union
@@ -10,6 +13,8 @@ import asciidag.graph
 import asciidag.node
 from senor_octopus.graph import Node
 from senor_octopus.graph import Source
+from senor_octopus.types import Event
+from senor_octopus.types import Stream
 
 
 def flatten(
@@ -57,3 +62,33 @@ def build_asciidag(
     )
 
     return asciidag_node
+
+
+async def merge_streams(*streams: Stream) -> Stream:
+    streams_next: Dict[
+        Stream,
+        Optional[Future[Event]],
+    ] = {stream: None for stream in streams}
+    stream_map: Dict[Future[Event], Stream] = {}
+    while streams_next:
+        for stream, next_ in streams_next.items():
+            if next_ is None:
+                future = asyncio.ensure_future(stream.__anext__())
+                stream_map[future] = stream
+                streams_next[stream] = future
+
+        done, pending = await asyncio.wait(
+            {stream for stream in streams_next.values() if stream},
+            return_when=asyncio.FIRST_COMPLETED,
+        )
+        for future in done:
+            # clear message in each completed stream
+            stream = stream_map[future]
+            streams_next[stream] = None
+
+            try:
+                event = future.result()
+            except StopAsyncIteration:
+                del streams_next[stream]
+                continue
+            yield event

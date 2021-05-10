@@ -1,7 +1,5 @@
 import asyncio
 import logging
-from datetime import datetime
-from datetime import timedelta
 from typing import Any
 from typing import cast
 from typing import Dict
@@ -120,21 +118,21 @@ class Sink(Node):
     ):
         super().__init__(node_name)
         self.plugin = plugin
-        self.throttle = (
-            timedelta(seconds=Duration(throttle).to_seconds()) if throttle else None
-        )
+        self.throttle = Duration(throttle).to_seconds() if throttle else None
         self.batch = Duration(batch).to_seconds() if batch else None
         self.extra_kwargs = extra_kwargs
 
-        self.last_run: Optional[datetime] = None
+        self.last_run: Optional[float] = None
         self.queue: asyncio.Queue = asyncio.Queue()
         self.task = asyncio.create_task(self.worker())
 
     async def run(self, stream: Stream) -> None:
+        loop = asyncio.get_running_loop()
+
         if (
             self.last_run is not None
             and self.throttle
-            and datetime.utcnow() - self.last_run <= self.throttle
+            and loop.time() - self.last_run <= self.throttle
         ):
             self._logger.info(
                 "Last run was %s, skipping this one due to throttle",
@@ -143,6 +141,7 @@ class Sink(Node):
             return
 
         self._logger.info("Running")
+        stream = self.run_and_update_last_run(stream)
 
         # when in batch mode, send events to queue for worker to process
         if self.batch:
@@ -153,8 +152,16 @@ class Sink(Node):
             self._logger.info("Processing events")
             await self.plugin(stream, **self.extra_kwargs)  # type: ignore
 
-        # TODO: only update if at least 1 event was received
-        self.last_run = datetime.utcnow()
+    async def run_and_update_last_run(self, stream: Stream) -> Stream:
+        loop = asyncio.get_running_loop()
+
+        at_least_one = False
+        async for event in stream:  # pragma: no cover
+            at_least_one = True
+            yield event
+
+        if at_least_one:
+            self.last_run = loop.time()
 
     async def worker(self) -> None:
         if self.batch is None:

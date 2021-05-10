@@ -78,31 +78,31 @@ async def test_mqtt_multiple_topics(mocker) -> None:
     mock.return_value.__aenter__.return_value.filtered_messages.side_effect = get_stream
     topics = ["topic/1", "other/1"]
     with vclock.patch_loop():
-        events = [event async for event in mqtt(topics)]
+        events = [event async for event in mqtt(topics, message_is_json=True)]
     assert events == [
         {
             "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.mqtt.topic/1",
-            "value": "0",
+            "value": 0,
         },
         {
             "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.mqtt.topic/1",
-            "value": "1",
+            "value": 1,
         },
         {
             "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.mqtt.other/1",
-            "value": "0",
+            "value": 0,
         },
         {
             "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.mqtt.topic/1",
-            "value": "2",
+            "value": 2,
         },
         {
             "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
             "name": "hub.mqtt.other/1",
-            "value": "1",
+            "value": 1,
         },
     ]

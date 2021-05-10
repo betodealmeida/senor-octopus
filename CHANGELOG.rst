@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.13 - 2021-MM-DD
+===========================
+
+- Handle JSON-encoded MQTT messages
+
 Version 0.1.12 - 2021-05-08
 ===========================
 

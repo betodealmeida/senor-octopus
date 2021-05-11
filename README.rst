@@ -36,7 +36,7 @@ How to these results look like?
 Events
 ======
 
-Señor Octopus uses a very simple but flexbile data model to move data around. We have nodes called **sources** that create a stream of events, each one like this:
+Señor Octopus uses a very simple but flexible data model to move data around. We have nodes called **sources** that create a stream of events, each one like this:
 
 .. code-block:: python
 
@@ -45,11 +45,9 @@ Señor Octopus uses a very simple but flexbile data model to move data around. W
         name: str
         value: Any
     
-    Stream = AsyncGenerator[Event, None]
-
 An event has a **timestamp** associated with it, a **name**, and a **value**. Note that the value can be anything!
 
-A source will produce a stream of events. In the example above, once per hour the ``speedtest`` source will produce events like these:
+A **source** will produce a stream of events. In the example above, once per hour the ``speedtest`` source will produce events like these:
 
 .. code-block:: python
 
@@ -83,12 +81,12 @@ A source will produce a stream of events. In the example above, once per hour th
         ...
     ]
 
-The events is sent to **sinks**, which consume the stream. In this example, the ``db`` sink will receive the events and store them in a Postgres database.
+The events are sent to **sinks**, which consume the stream. In this example, the ``db`` sink will receive the events and store them in a Postgres database.
 
 Event-driven sources
 ====================
 
-In the previous example we configured the ``speedtest`` source to run hourly. Not all sources need to be scheduled, though. We can have a source that listens to a given topic in a `MQTT <https://mqtt.org/>`_, eg:
+In the previous example we configured the ``speedtest`` source to run hourly. Not all sources need to be scheduled, though. We can have a source that listens to a given topic in `MQTT <https://mqtt.org/>`_, eg:
 
 .. code-block:: yaml
 
@@ -122,7 +120,7 @@ The example above is not super efficient, since it writes to the database every 
       port: 5432
       dbname: default
 
-With the ``batch`` parameter any incoming events are stored in a queue for the configured time, and processed by the sink together. Any pending events in the queue will be processed if ``srocto`` terminates gracefully (eg, with ``ctrl+C``).
+With the ``batch`` parameter any incoming events are stored in a queue for the configured time, and processed by the sink together. Any pending events in the queue will still be processed if ``srocto`` terminates gracefully (eg, with ``ctrl+C``).
 
 Filtering events
 ================
@@ -190,7 +188,6 @@ Here's how we can do that:
       plugin: source.awair
       flow: -> bad_air
       schedule: 0/10 * * * *
-      prefix: hub.awair
       access_token: XXX
       device_type: awair-element
       device_id: 12345
@@ -226,7 +223,7 @@ This is then sent to the ``sms`` sink, which has a ``throttle`` of 30 minutes. T
 Plugins
 =======
 
-Señor Octopus supports an increasing list of plugins types, and it's straightforward to add new ones. Each plugin is simply a function that process a stream.
+Señor Octopus supports an increasing list of plugins, and it's straightforward to add new ones. Each plugin is simply a function that produces, processes, or consumes a stream.
 
 Here's the ``random`` source, which produces random numbers:
 

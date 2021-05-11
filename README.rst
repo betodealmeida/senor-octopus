@@ -14,7 +14,7 @@ They say there are only 2 kinds of work: you either move information from one pl
       schedule: @hourly
 
     db:
-      plugin: sink.db.postgresl
+      plugin: sink.db.postgresql
       flow: speedtest ->
       user: alice
       password: XXX
@@ -292,7 +292,7 @@ The current plugins for sources are:
 Filters
 ~~~~~~~
 
-Filters are very similar, the main difference being how you configure them:
+The existing filters are very similar, the main difference being how you configure them:
 
 - `filter.format <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/format.py>`_: Format an event stream based using Python string formatting.
 - `filter.jinja <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/jinja.py>`_: Apply a Jinja2 template to events.
@@ -300,6 +300,8 @@ Filters are very similar, the main difference being how you configure them:
 
 Sinks
 ~~~~~
+
+These are the current sinks:
 
 - `sink.log <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/log.py>`_: Send events to a logger.
 - `sink.mqtt <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/mqtt.py>`_: Send events as messages to an MQTT topic.

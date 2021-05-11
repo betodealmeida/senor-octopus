@@ -12,11 +12,6 @@ async def stream() -> Stream:
             "name": "turn",
             "value": value,
         }
-    yield {
-        "timestamp": datetime(2021, 1, 1),
-        "name": "foo",
-        "value": "bar",
-    }
 
 
 @pytest.mark.asyncio

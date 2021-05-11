@@ -55,10 +55,9 @@ async def tuya(
 
     async for event in stream:  # pragma: no cover
         _logger.debug(event)
-        if event["name"].lower() == "turn":
-            if event["value"].lower() == "on":
-                devices[device].turn_on()
-            elif event["value"].lower() == "off":
-                devices[device].turn_off()
-            else:
-                _logger.warning("Unknown value: %s", event["value"])
+        if event["value"].lower() == "on":
+            devices[device].turn_on()
+        elif event["value"].lower() == "off":
+            devices[device].turn_off()
+        else:
+            _logger.warning("Unknown value: %s", event["value"])

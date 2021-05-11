@@ -2,10 +2,12 @@
 Changelog
 =========
 
-Version 0.1.13 - 2021-MM-DD
+Version 0.1.13 - 2021-05-10
 ===========================
 
 - Handle JSON-encoded MQTT messages
+- Fix throttle by ignoring runs without events
+- Log exceptions
 
 Version 0.1.12 - 2021-05-08
 ===========================

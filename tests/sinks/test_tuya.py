@@ -16,10 +16,11 @@ async def stream() -> Stream:
 
 @pytest.mark.asyncio
 async def test_tuya(mocker) -> None:
-    mock_api = mocker.patch("senor_octopus.sinks.tuya.api")
+    TuyaApi = mocker.patch("senor_octopus.sinks.tuya.TuyaApi")
+    api = TuyaApi.return_value
     mock_device = mocker.MagicMock()
     mock_device.name.return_value = "My switch"
-    mock_api.get_all_devices.return_value = [mock_device]
+    api.get_all_devices.return_value = [mock_device]
 
     mock_logger = mocker.patch("senor_octopus.sinks.tuya._logger")
 
@@ -32,10 +33,11 @@ async def test_tuya(mocker) -> None:
 
 @pytest.mark.asyncio
 async def test_tuya_invalid_device(mocker) -> None:
-    mock_api = mocker.patch("senor_octopus.sinks.tuya.api")
+    TuyaApi = mocker.patch("senor_octopus.sinks.tuya.TuyaApi")
+    api = TuyaApi.return_value
     mock_device = mocker.MagicMock()
     mock_device.name.return_value = "My switch"
-    mock_api.get_all_devices.return_value = [mock_device]
+    api.get_all_devices.return_value = [mock_device]
 
     mock_logger = mocker.patch("senor_octopus.sinks.tuya._logger")
 

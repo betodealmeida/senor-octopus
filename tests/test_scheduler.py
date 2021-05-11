@@ -65,7 +65,7 @@ async def test_scheduler_cancel() -> None:
         scheduler = Scheduler(mock_dag)  # type: ignore
         await asyncio.gather(scheduler.run(), cancel_scheduler(scheduler))
 
-    assert len(scheduler.tasks) == 2
+    assert len(scheduler.tasks) == 1
     assert scheduler.cancelled
     assert len(mock_source1.run.mock_calls) == 2
 
@@ -76,3 +76,24 @@ async def test_scheduler_no_jobs() -> None:
     with vclock.patch_loop():
         scheduler = Scheduler({})  # type: ignore
         await scheduler.run()
+
+
+@pytest.mark.asyncio
+async def test_scheduler_exceptions(mocker) -> None:
+    mock_source1 = mock.MagicMock()
+    mock_source1.schedule.next.return_value = 10
+    mock_source1.run = CoroutineMock()
+    mock_source1.run.side_effect = Exception("A wild error appeared!")
+    mock_dag = {mock_source1}
+    _logger = mocker.patch("senor_octopus.scheduler._logger")
+    vclock = aiotools.VirtualClock()
+
+    async def cancel_scheduler(scheduler) -> None:
+        await asyncio.sleep(25)
+        scheduler.cancel()
+
+    with vclock.patch_loop():
+        scheduler = Scheduler(mock_dag)  # type: ignore
+        await asyncio.gather(scheduler.run(), cancel_scheduler(scheduler))
+
+    assert len(_logger.exception.mock_calls) == 2

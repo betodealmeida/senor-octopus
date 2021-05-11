@@ -64,7 +64,10 @@ async def mqtt(
 
 
 async def read_from_topic(
-    client: Client, topic: str, prefix: str, message_is_json: bool,
+    client: Client,
+    topic: str,
+    prefix: str,
+    message_is_json: bool,
 ) -> Stream:
     async with client.filtered_messages(topic) as messages:
         _logger.debug("Subscribing to topic: %s", topic)

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Awaitable
 from typing import Dict
 from typing import List
 from typing import Set
@@ -7,6 +8,19 @@ from typing import Set
 from senor_octopus.graph import Source
 
 _logger = logging.getLogger(__name__)
+
+
+async def log_exceptions(run: Awaitable[None]) -> None:
+    """
+    Manually handle exceptions.
+
+    https://bugs.python.org/issue39839
+    """
+    try:
+        return await run
+    except Exception:
+        _logger.exception("Unhandled exception")
+    return None
 
 
 class Scheduler:
@@ -26,7 +40,7 @@ class Scheduler:
         event_nodes = {node for node in self.dag if not node.schedule}
         for node in event_nodes:
             _logger.debug("Starting %s", node.name)
-            task = asyncio.create_task(node.run())
+            task = asyncio.create_task(log_exceptions(node.run()))
             self.tasks.append(task)
 
         schedule_nodes = {node for node in self.dag if node.schedule}
@@ -39,13 +53,15 @@ class Scheduler:
 
                 if node.name in schedules and schedules[node.name] <= now:
                     _logger.info("Running %s", node.name)
-                    task = asyncio.create_task(node.run())
+                    task = asyncio.create_task(log_exceptions(node.run()))
                     self.tasks.append(task)
                     del schedules[node.name]
 
                 if node.name not in schedules:
                     _logger.info("Scheduling %s to run in %d seconds", node.name, delay)
                     schedules[node.name] = when
+
+            self.tasks = [task for task in self.tasks if not task.done()]
 
             sleep_time = min(schedules.values()) - now if schedules else 3600
             _logger.debug("Sleeping for %d seconds", sleep_time)

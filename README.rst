@@ -2,169 +2,307 @@
 senor-octopus
 =============
 
-Señor Octopus is a streaming hub, fetching data from APIs, transforming it, filtering it, and storing it, based on a declarative configuration.
+They say there are only 2 kinds of work: you either move information from one place to another, or you move mass from one place to another.
 
-Confused? Keep reading.
-
-A simple example
-================
-
-Señor Octopus reads a pipeline definition from a YAML configuration file like this:
+**Señor Octopus is an application that moves data around**. It reads a YAML configuration file that describes how to connect **nodes**. For example, you might want to measure your internet speed every hour and store it in a database:
 
 .. code-block:: yaml
 
-    # generate random numbers and send them to "check" and "normal"
-    random:
-      plugin: source.random
-      flow: -> check, normal
-      schedule: "* * * * *"  # every minute
+    speedtest:
+      plugin: source.speedtest
+      flow: -> db
+      schedule: @hourly
 
-    # filter numbers from "random" that are > 0.5 and send to "high"
-    check:
-      plugin: filter.jsonpath
-      flow: random -> high
-      filter: "$.events[?(@.value>0.5)]"
+    db:
+      plugin: sink.db.postgresl
+      flow: speedtest ->
+      user: alice
+      password: XXX
+      host: localhost
+      port: 5432
+      dbname: default
 
-    # log all the numbers coming from "random" at the default level
-    normal:
-      plugin: sink.log
-      flow: "* ->"
-      batch: 5 minutes
-
-    # log all the numbers coming from "check" at the warning level
-    high:
-      plugin: sink.log
-      flow: check ->
-      level: warning
-
-The example above has a **source** called "random", that generates random numbers every minute (its ``schedule``). It's connected to 2 other nodes, "check" and "normal" (``flow = -> check, normal``). Each random number is sent in an **event** that looks like this:
-
-.. code-block:: json
-
-    {
-        "timestamp": "2021-01-01T00:00:00+00:00",
-        "name": "hub.random",
-        "value": 0.6394267984578837
-    }
-
-The node ``check`` is a **filter** that verifies that the value of each number is greater than 0.5. Events that pass the filter are sent to the ``high`` node (the filter connects the two nodes, according to ``flow = random -> high``).
-
-The node ``normal`` is a **sink** that logs events. It receives events from any other node (``flow = * ->``), and stores them in a queue, logging them at the ``INFO`` level (the default) every 5 minutes (``batch = 5 minutes``). The node ``high``, on the other hand, receives events only from ``check``, and logs them immediately at the ``WARNING`` level.
-
-To run it:
+You can save this to a file called ``speedtest.yaml`` and run:
 
 .. code-block:: bash
 
-    $ srocto config.yaml -vv
-    [2021-03-25 14:28:26] INFO:senor_octopus.cli:Reading configuration
-    [2021-03-25 14:28:26] INFO:senor_octopus.cli:Building DAG
-    [2021-03-25 14:28:26] INFO:senor_octopus.cli:
-    *   random
-    |\
-    * | check
-    | * normal
-    * high
+    $ pip install senor-octopus
+    $ srocto speedtest.yaml
 
-    [2021-03-25 14:28:26] INFO:senor_octopus.cli:Running Sr. Octopus
-    [2021-03-25 14:28:26] INFO:senor_octopus.scheduler:Starting scheduler
-    [2021-03-25 14:28:26] INFO:senor_octopus.scheduler:Scheduling random to run in 33.76353 seconds
-    [2021-03-25 14:28:26] DEBUG:senor_octopus.scheduler:Sleeping for 5 seconds
+Every hour the ``speedtest`` **source** node will run, and the results will be sent to the ``db`` **sink** node, which writes them to a Postgres database.
 
-To stop running, press ``ctrl+C``. Any batched events will be processed before the scheduler terminates.
+How to these results look like?
 
-A concrete example
-==================
+Events
+======
 
-Now for a more realistic example. I wanted to monitor the air quality in my bedroom, using an `Awair Element <https://www.getawair.com/home/element>`_. Since their API is throttled I want to read values once every 5 minutes, and store everything in a Postgres database. If the CO2 value is higher than 1000 ppm I want to receive a notification on my phone, limited to one message every 30 minutes.
+Señor Octopus uses a very simple but flexbile data model to move data around. We have nodes called **sources** that create a stream of events, each one like this:
 
-This is the config I use for that:
+.. code-block:: python
 
-.. code-block:: yaml
+    class Event(TypedDict):
+        timestamp: datetime
+        name: str
+        value: Any
+    
+    Stream = AsyncGenerator[Event, None]
 
-    awair:
-      plugin: source.awair
-      flow: -> *
-      schedule: "*/5 * * * *"
-      prefix: hub.awair
-      access_token: XXX
-      device_type: awair-element
-      device_id: 12345
-      
-    high_co2:
-      plugin: filter.jsonpath
-      flow: awair -> pushover
-      filter: '$.events[?(@.name=="hub.awair.co2" and @.value>1000)]'
-      
-    pushover:
-      plugin: sink.pushover
-      flow: high_co2 ->
-      throttle: 30 minutes
-      app_token: XXX
-      user_token: johndoe
-      
-    db:
-      plugin: sink.db.postgresql
-      flow: "* ->"
-      batch: 15 minutes
-      dbname: dbname
-      user: user
-      password: password
-      host: host
-      port: 5432
+An event has a **timestamp** associated with it, a **name**, and a **value**. Note that the value can be anything!
 
-I'm using `Pushover <https://pushover.net/>`_ to send notifications to my phone.
+A source will produce a stream of events. In the example above, once per hour the ``speedtest`` source will produce events like these:
 
-Will it rain?
-=============
+.. code-block:: python
 
-Here's another example, a pipeline that will notify you if tomorrow will rain:
+    [
+        {
+            'timestamp': datetime.datetime(2021, 5, 11, 22, 16, 26, 812083, tzinfo=datetime.timezone.utc),
+            'name': 'hub.speedtest.download',
+            'value': 16568200.018792046,
+        },
+        {
+            'timestamp': datetime.datetime(2021, 5, 11, 22, 16, 26, 812966, tzinfo=datetime.timezone.utc),
+            'name': 'hub.speedtest.upload',
+            'value': 5449607.159468643,
+        },
+        {
+            'timestamp': datetime.datetime(2021, 5, 11, 22, 16, 26, 820369, tzinfo=datetime.timezone.utc),
+            'name': 'hub.speedtest.client',
+            'value': {
+                'ip': '173.211.12.32',
+                'lat': '37.751',
+                'lon': '-97.822',
+                'isp': 'Colocation America Corporation',
+                'isprating': '3.7',
+                'rating': '0',
+                'ispdlavg': '0',
+                'ispulavg': '0',
+                'loggedin': '0',
+                'country': 'US',
+            }
+        },
+        ...
+    ]
 
-.. code-block:: yaml
-
-    weather:
-      plugin: source.weatherapi
-      flow: -> will_it_rain
-      schedule: 0 12 * * *
-      location: London
-      access_token: XXX
-
-    will_it_rain:
-      plugin: filter.jsonpath
-      flow: weather -> pushover
-      filter: '$.events[?(@.name=="hub.weatherapi.forecast.forecastday.daily_will_it_rain" and @.value==1)]'
-
-    pushover:
-      plugin: sink.pushover
-      flow: will_it_rain ->
-      throttle: 30 minutes
-      app_token: XXX
-      user_token: johndoe
+The events is sent to **sinks**, which consume the stream. In this example, the ``db`` sink will receive the events and store them in a Postgres database.
 
 Event-driven sources
 ====================
 
-Señor Octopus also supports event-driven sources. Differently to the sources in the previous examples, these sources run constantly and respond immediately to events. An example is the `MQTT <https://mqtt.org/>`_ source:
+In the previous example we configured the ``speedtest`` source to run hourly. Not all sources need to be scheduled, though. We can have a source that listens to a given topic in a `MQTT <https://mqtt.org/>`_, eg:
 
 .. code-block:: yaml
 
     mqtt:
       plugin: source.mqtt
-      flow: -> log
-      topics: test/#
-      host: mqtt.example.org
+      flow: -> db
+      topics:
+        - "srocto/feeds/#"
+      host: localhost
+      port: 1883
+      username: bob
+      password: XXX
+      message_is_json: true
 
-    log:
-      plugin: sink.log
-      flow: mqtt ->
+The source above will immediately send an event to the ``db`` node every time a new message shows up in the topic wildcard ``srocto/feeds/#``, so it can be written to the database — a super easy way of persisting a message queue to disk!
 
-Running the pipeline above, when an event arrives in the MQTT topic ``test/#`` (eg, ``test/1``) it will be immediately sent to the log.
+Batching events
+===============
 
-There's also an MQTT sink, that will publish events to a given topic:
+The example above is not super efficient, since it writes to the database every time an event arrives. Instead, we can easily **batch** the events so that they're accumulated in a queue and processed every, say, 5 minutes:
 
 .. code-block:: yaml
 
-    mqtt:
-      plugin: sink.mqtt
-      flow: "* ->"
-      topic: test/1
-      host: mqtt.example.org
+    db:
+      plugin: sink.db.postgresl
+      flow: speedtest, mqtt ->
+      batch: 5 minutes
+      user: alice
+      password: XXX
+      host: localhost
+      port: 5432
+      dbname: default
+
+With the ``batch`` parameter any incoming events are stored in a queue for the configured time, and processed by the sink together. Any pending events in the queue will be processed if ``srocto`` terminates gracefully (eg, with ``ctrl+C``).
+
+Filtering events
+================
+
+Much of the flexibility of Señor Octopus comes from a third type of node, the **filter**. Filters can be used to not only filter data, but also format it. For example, let's say we want to turn on some lights at sunset. The ``sun`` source will send events with a value of "sunset" or "sunrise" every time one occurs:
+
+.. code-block:: python
+
+    {
+        'timestamp': ...,
+        'name': 'hub.sun',
+        'value': 'sunset',
+    }
+
+The ``tuya`` sink can be used to control a smart switch, but in order to turn it on it expects an event that looks like this:
+
+.. code-block:: python
+
+    {
+        'timestamp': ...,
+        'name': ...,
+        'value': 'on',
+    }
+
+We can use the ``jinja`` filter to ignore "sunrise" events, and to convert the "sunset" value into "on":
+
+
+.. code-block:: yaml
+
+    sun:
+      plugin: source.sun
+      flow: -> sunset
+      latitude: 38.3
+      longitude: -123.0
+
+    sunset:
+      plugin: filter.jinja
+      flow: sun -> lights
+      template: >
+        {% if event['value'] == 'sunset' %}
+          on
+        {% endif %}
+
+    lights:
+      plugin: sink.tuya
+      flow: sunset ->
+      device: "Porch lights"
+      email: charlie@example.com
+      password: XXX
+      country: "1"
+      application: smart_life
+
+With this configuration the ``sunset`` filter will drop any events that don't have a value of "sunset". And for those events that have, the value will be replaced by the string "on" so it can activate the lights in the ``lights`` node.
+
+Throttling
+==========
+
+Sometimes we want to limit the number of events being consumed by a sink. For example, imagine that we want to use Señor Octopus to monitor air quality using an `Awair Element <https://www.getawair.com/home/element>`_, sending us an SMS when the score is below a given threshold. We would like the SMS to be sent at most once every 30 minutes, and only between 8am and 10pm.
+
+Here's how we can do that:
+
+.. code-block:: yaml
+
+    awair:
+      plugin: source.awair
+      flow: -> bad_air
+      schedule: 0/10 * * * *
+      prefix: hub.awair
+      access_token: XXX
+      device_type: awair-element
+      device_id: 12345
+    
+    bad_air:
+      plugin: filter.jinja
+      flow: awair -> sms
+      template: >
+        {% if
+           event['timestamp'].hour >= 8 and
+           event['timestamp'].hour <= 21 and
+           event['name'] == 'hub.awair.score' and
+           event['value'] < 80
+        %}
+          Air quality score is low: {{ event['value'] }}
+        {% endif %}
+    
+    sms:
+      plugin: sink.sms
+      flow: bad_air ->
+      throttle: 30 minutes
+      account_sid: XXX
+      auth_token: XXX
+      from: "+18002738255"
+      to: "+15558675309"
+
+In the example above, the ``awair`` source will fetch air quality data every 10 minutes, and send it to ``bad_air``. The filter checks for the hour, to prevent sending an SMS from 10pm to 8am, and checks the air quality score — if it's lower than 80 it will reformat the value of the event to a nice message, eg:
+
+    "Air quality score is low: 70"
+
+This is then sent to the ``sms`` sink, which has a ``throttle`` of 30 minutes. The throttle configuration will prevent the sink from running more than once every 30 minutes, to avoid spamming us with messages in case the score remains low.
+
+Plugins
+=======
+
+Señor Octopus supports an increasing list of plugins types, and it's straightforward to add new ones. Each plugin is simply a function that process a stream.
+
+Here's the ``random`` source, which produces random numbers:
+
+.. code-block:: python
+
+    async def rand(events: int = 10, prefix: str = "hub.random") -> Stream:
+        for _ in range(events):
+            yield {
+                "timestamp": datetime.now(timezone.utc),
+                "name": prefix,
+                "value": random.random(),
+            }
+
+This is the full source code for the ``jinja`` filter:
+
+.. code-block:: python
+
+    async def jinja(stream: Stream, template: str) -> Stream:
+        _logger.debug("Applying template to events")
+        tmpl = Template(template)
+        async for event in stream:
+            value = tmpl.render(event=event)
+            if value:
+                yield {
+                    "timestamp": event["timestamp"],
+                    "name": event["name"],
+                    "value": value,
+                }
+
+And this is the ``sms`` sink:
+
+.. code-block:: python
+
+    async def sms(
+        stream: Stream, account_sid: str, auth_token: str, to: str, **kwargs: str
+    ) -> None:
+        from_ = kwargs["from"]
+        client = Client(account_sid, auth_token)
+        async for event in stream:
+            _logger.debug(event)
+            _logger.info("Sending SMS")
+            client.messages.create(body=str(event["value"]).strip(), from_=from_, to=to)
+
+As you can see, a source is an async generator that yields events. A filter receives the stream with additional configuration parameters, and also returns a stream. And a sink receives a stream with additional parameters, and returns nothing.
+
+Sources
+~~~~~~~
+
+The current plugins for sources are:
+
+- `source.awair <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/awair.py>`_: Fetch air quality data from Awair Element monitor.
+- `source.crypto <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/crypto.py>`_: Fetch price of cryptocurrencies from cryptocompare.com.
+- `source.mqtt <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/mqtt.py>`_: Subscribe to messages on one or more MQTT topics.
+- `source.rand <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/rand.py>`_: Generate random numbers between 0 and 1.
+- `source.speed <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/speed.py>`_: Measure internet speed.
+- `source.sqla <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/sqla.py>`_: Read data from database.
+- `source.static <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/static.py>`_: Generate static events.
+- `source.stock <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/stock.py>`_: Fetch stock price form Yahoo! Finance.
+- `source.sun <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/sun.py>`_: Send events on sunrise and sunset.
+- `source.weatherapi <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/weatherapi.py>`_: Fetch weather forecast data from weatherapi.com.
+- `source.whistle <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/whistle.py>`_: Fetch device information and location for a Whistle pet tracker.
+
+Filters
+~~~~~~~
+
+Filters are very similar, the main difference being how you configure them:
+
+- `filter.format <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/format.py>`_: Format an event stream based using Python string formatting.
+- `filter.jinja <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/jinja.py>`_: Apply a Jinja2 template to events.
+- `filter.jsonpath <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/jpath.py>`_: Filter event stream based on a JSON path.
+
+Sinks
+~~~~~
+
+- `sink.log <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/log.py>`_: Send events to a logger.
+- `sink.mqtt <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/mqtt.py>`_: Send events as messages to an MQTT topic.
+- `sink.pushover <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/pushover.py>`_: Send events to the Pushover mobile app.
+- `sink.sms <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/sms.py>`_: Send SMS via Twilio.
+- `sink.tuya <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/tuya.py>`_: Send commands to a Tuya/Smart Life device.

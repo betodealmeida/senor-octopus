@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.1.14 - 2021-MM-DD
+===========================
+
+- New filter: Jinja2 template
+- New sink: Twilio SMS
+
 Version 0.1.13 - 2021-05-10
 ===========================
 

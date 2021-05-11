@@ -54,7 +54,7 @@ class Node:
             raise Exception(f"Invalid plugin name `{plugin_name}`")
 
         kwargs = section.copy()
-        flow = kwargs.pop("flow")
+        flow = kwargs.pop("flow").strip()
         if flow.startswith("->"):
             return Source(node_name, plugin, **kwargs)
         if flow.endswith("->"):

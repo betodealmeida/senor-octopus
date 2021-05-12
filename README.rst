@@ -226,8 +226,8 @@ Here's how we can do that:
       flow: awair -> sms
       template: >
         {% if
-           event['timestamp'].hour >= 8 and
-           event['timestamp'].hour <= 21 and
+           event['timestamp'].astimezone().hour >= 8 and
+           event['timestamp'].astimezone().hour <= 21 and
            event['name'] == 'hub.awair.score' and
            event['value'] < 80
         %}

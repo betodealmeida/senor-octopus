@@ -15,16 +15,16 @@ from senor_octopus.sources.rand import rand
 @pytest.mark.asyncio
 async def test_postgresql(mocker) -> None:
     mock_aiopg = CoroutineMock()
-    mock_cursor = (
-        mock_aiopg.create_pool.return_value.__aenter__.return_value.acquire.return_value.__aenter__.return_value.cursor.return_value.__aenter__.return_value
-    )
-    mock_cursor.execute = CoroutineMock()
+    pool = mock_aiopg.create_pool.return_value.__aenter__.return_value
+    conn = pool.acquire.return_value.__aenter__.return_value
+    cursor = conn.cursor.return_value.__aenter__.return_value
+    cursor.execute = CoroutineMock()
     mocker.patch("senor_octopus.sinks.db.postgresql.aiopg", mock_aiopg)
     random.seed(42)
 
     await postgresql(rand(1), "user", "password", "host", 5432, "dbname")
 
-    mock_cursor.execute.assert_has_calls(
+    cursor.execute.assert_has_calls(
         [
             mock.call(
                 sql.Composed(
@@ -32,7 +32,8 @@ async def test_postgresql(mocker) -> None:
                         sql.SQL("\nCREATE TABLE IF NOT EXISTS "),
                         sql.Identifier("events"),
                         sql.SQL(
-                            ' (\n    "timestamp" TIMESTAMP,\n    "name" VARCHAR,\n    "value" JSON\n);\n',
+                            ' (\n    "timestamp" TIMESTAMP,\n    '
+                            '"name" VARCHAR,\n    "value" JSON\n);\n',
                         ),
                     ],
                 ),
@@ -71,12 +72,12 @@ async def test_postgresql(mocker) -> None:
 @pytest.mark.asyncio
 async def test_postgresql_empty_stream(mocker) -> None:
     mock_aiopg = CoroutineMock()
-    mock_cursor = (
-        mock_aiopg.create_pool.return_value.__aenter__.return_value.acquire.return_value.__aenter__.return_value.cursor.return_value.__aenter__.return_value
-    )
-    mock_cursor.execute = CoroutineMock()
+    pool = mock_aiopg.create_pool.return_value.__aenter__.return_value
+    conn = pool.acquire.return_value.__aenter__.return_value
+    cursor = conn.cursor.return_value.__aenter__.return_value
+    cursor.execute = CoroutineMock()
     mocker.patch("senor_octopus.sinks.db.postgresql.aiopg", mock_aiopg)
     random.seed(42)
 
     await postgresql(rand(0), "user", "password", "host", 5432, "dbname")
-    assert len(mock_cursor.execute.mock_calls) == 2
+    assert len(cursor.execute.mock_calls) == 2

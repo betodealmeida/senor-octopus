@@ -25,10 +25,9 @@ async def test_mqtt(mocker) -> None:
     mock = mocker.patch("senor_octopus.sources.mqtt.Client")
     mock.return_value.__aenter__.return_value = mocker.MagicMock()
     mock.return_value.__aenter__.return_value.subscribe = mocker.AsyncMock()
-    mock.return_value.__aenter__.return_value.filtered_messages.return_value.__aenter__ = (
-        mocker.AsyncMock()
-    )
-    mock.return_value.__aenter__.return_value.filtered_messages.return_value.__aenter__.return_value = aiter(
+    filtered_messages = mock.return_value.__aenter__.return_value.filtered_messages
+    filtered_messages.return_value.__aenter__ = mocker.AsyncMock()
+    filtered_messages.return_value.__aenter__.return_value = aiter(
         messages,
     )
     topics = ["topic/#"]

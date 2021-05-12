@@ -7,7 +7,7 @@ auto_cancellation: false
 env:
   PATH: ${HOME}/.local/bin:${PATH}
   # ^  add user paths
-  COVERALLS_REPO_TOKEN: ENCRYPTED[]
+  COVERALLS_REPO_TOKEN: ENCRYPTED[a15f3d145e18bd756214a92c4633a1021da630af6f35ec285c3a4c8c073efdd0d72be9c4faccc52d8cb834619ec038d2]
   # ^ ADD YOUR ENCRYPTED TOKEN HERE: https://cirrus-ci.org/guide/writing-tasks/#encrypted-variables
   PIP_CACHE: ${HOME}/.cache/pip
   LC_ALL: C.UTF-8
@@ -22,8 +22,8 @@ env:
     - python -m pip install --upgrade pip setuptools tox
   prepare_script: &prepare
     # This script is also used in Windows, so the shell is not POSIX
-    - git config --global user.email "you@example.com"
-    - git config --global user.name "Your Name"
+    - git config --global user.email "roberto@dealmeida.net"
+    - git config --global user.name "Beto Dealmeida"
   clean_workspace_script:
     # Avoid information carried from one run to the other
     - rm -rf .coverage junit-*.xml .tox
@@ -49,25 +49,19 @@ linux_mac_task:
       git reset --hard $CIRRUS_CHANGE_IN_REPO
     fi
   matrix:
-    - name: test (Linux - 3.6)
-      container: {image: "python:3.6-buster"}
-      install_script: &debian-install
-        - apt-get install -y git
-    - name: test (Linux - 3.7)
-      container: {image: "python:3.7-buster"}
-      install_script: *debian-install
     - name: test (Linux - 3.8)
       container: {image: "python:3.8-buster"}
-      install_script: *debian-install
+      install_script: &debian-install
+        - apt-get install -y git
     - name: test (Linux - 3.9)
       container: {image: "python:3.9-buster"}
       install_script: *debian-install
     - name: test (Linux - Anaconda)
-      container: {image: "continuumio/anaconda3:2019.03"}
+      container: {image: "continuumio/anaconda3:2021.04"}
       install_script: *debian-install
       extra_install_script:
         - apt-get update
-        - apt-get install -y --fix-missing gcc python3-dev
+        - apt-get install -y --fix-missing gcc python3-dev libpq-dev g++
           # ^  required by a weird conda bug - apparently this is needed for isolated builds
           #    https://cirrus-ci.com/task/5049814234693632?command=test#L251
     - name: test (OS X)
@@ -81,87 +75,20 @@ linux_mac_task:
       brew_cache:
         folder: "$HOME/Library/Caches/Homebrew"
       install_script:
-        - brew install python gnu-tar
+        - brew install python gnu-tar postgresql
         - brew cleanup
   <<: *REGULAR_TASK_TEMPLATE
-
-
-# If you find some problems with long paths on Windows,
-# please check the .cirrus.yml file of PyScaffold itself for some workarounds.
-windows_task:
-  name: test (Windows)
-  tools_cache:
-    folder: 'C:\tools'
-    fingerprint_script:
-      - ps: echo "$env:CIRRUS_OS - nuget v5.6.0 - git v2.27.0"
-    populate_script:
-      - ps: (mkdir 'C:\tools')
-      # ^  use parentheses to suppress errors
-      - ps: Invoke-WebRequest -OutFile 'C:\tools\nuget.exe' 'https://dist.nuget.org/win-x86-commandline/v5.6.0/nuget.exe'
-      - ps: nuget install GitForWindows -Version 2.27.0 -NonInteractive -OutputDirectory 'C:\tools'
-  workaround_git_script:
-    - git config --system core.longpaths true  # Fix for windows git checkout problems
-  clone_script:
-    # Use custom cloning since otherwise git tags are missing
-    CMD.exe /C ECHO ON &
-    IF NOT DEFINED CIRRUS_PR (
-      git clone --recursive --branch=%CIRRUS_BRANCH% https://x-access-token:%CIRRUS_REPO_CLONE_TOKEN%@github.com/%CIRRUS_REPO_FULL_NAME%.git %CIRRUS_WORKING_DIR% &
-      git reset --hard %CIRRUS_CHANGE_IN_REPO%
-    ) ELSE (
-      git clone --recursive https://x-access-token:%CIRRUS_REPO_CLONE_TOKEN%@github.com/%CIRRUS_REPO_FULL_NAME%.git %CIRRUS_WORKING_DIR% &
-      git fetch origin pull/%CIRRUS_PR%/head:pull/%CIRRUS_PR% &
-      git reset --hard %CIRRUS_CHANGE_IN_REPO%
-    )
-  windows_container:
-    image: "python:3.8-windowsservercore"
-    os_version: 2019
-  env:
-    # Single quotes are used bellow to escape Windows backslash and % (YAML restrictions).
-    PYTHON_HOME: 'C:\Python'
-    PYTHON_APPDATA: '%APPDATA%\Python\Python38'
-    # ^  update when python version changes
-    GIT_HOME: 'C:\tools\GitForWindows.2.27.0\tools'
-    # ^ update when git version changes
-    HOME: '%USERPROFILE%'
-    USERNAME: ContainerAdministrator
-    # ^  ensure USERNAME is set in Windows, so the getpass module doesn't raise exceptions
-    PATH: '%HOME%\.local\bin\;%PYTHON_APPDATA%\Scripts\;%PYTHON_HOME%\;%PYTHON_HOME%\Scripts\;C:\tools\;%GIT_HOME%\cmd\;%PATH%'
-    # ^  add user paths (if POSIX tools are needed you can try also adding %GIT_HOME\usr\bin\)
-    PIP_CACHE: '%LocalAppData%\pip\Cache'
-    PIP_TRUSTED_HOST: 'pypi.org pypi.python.org files.pythonhosted.org'
-    PIP_CONFIG_FILE: '%AppData%\pip\pip.ini'
-    COVERAGE: 'NO'
-  pip_cache:
-    folder: '%PIP_CACHE%'
-  install_script:
-    # Activate long file paths to avoid some errors
-    - REG ADD HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem /v LongPathsEnabled /t REG_DWORD /d 1 /f
-    # Set Windows encoding to UTF-8
-    - REG ADD "HKEY_CURRENT_USER\Software\Microsoft\Command Processor" /v Autorun /t REG_SZ /d "@chcp 65001>nul" /f
-    - python -m ensurepip
-    - python -m pip install --upgrade --user pip setuptools certifi tox
-  prepare_script: *prepare
-  clean_workspace_script:
-    # Avoid information carried from one run to the other
-    # CMD is not capable of globbing, so we have to use PowerShell
-    - ps: (rm -Recurse -Force -ErrorAction SilentlyContinue .tox,junit-*.xml)
-  build_script: *build
-  test_script: *test
 
 
 coverage_task:
   name: coverage (Linux)
   clone_script: *clone
-  container: {image: "python:3.6-buster"}
+  container: {image: "python:3.9-buster"}
   env:
     COVERAGE: yes
     PRE_COMMIT_HOME: ${HOME}/.cache/pre-commit
   depends_on:
-    - test (Linux - 3.6)
-    - test (Linux - 3.7)
-    - test (Linux - 3.8)
-    - test (Linux - Anaconda)
-    - test (OS X)
+    - test (Linux - 3.9)
   install_script: *debian-install
   pip_install_script:
     pip install --user --upgrade coverage coveralls pre-commit

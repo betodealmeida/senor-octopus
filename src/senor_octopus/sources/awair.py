@@ -22,7 +22,7 @@ async def awair(
     Parameters
     ----------
     access_token
-        Access token from the Awair API (https://developer.getawair.com/console/access-token)
+        Awair API access token (https://developer.getawair.com/console/access-token)
     device_id
         Device ID
     device_type

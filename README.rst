@@ -21,8 +21,37 @@ They say there are only 2 kinds of work: you either move information from one pl
       host: localhost
       port: 5432
       dbname: default
+      
+Nodes are connected by the ``flow`` attribute. The ``speedtest`` node is connected to the ``db`` node because it points to it:
 
-You can save this to a file called ``speedtest.yaml`` and run:
+.. code-block:: yaml
+
+    speedtest:
+      flow: -> db
+
+The ``db`` node, on the other hand, listens to events from the ``speedtest`` node:
+
+.. code-block:: yaml
+
+    db:
+      flow: speedtest ->
+
+We can also use ``*`` as a wildcard, if we want a node to connect to all other nodes, or specify a list of nodes:
+
+.. code-block:: yaml
+
+    speedtest:
+      flow: -> db, log
+      
+    db:
+      flow: "* ->"
+      
+Note that in YAML we need to quote attributes that start with an asterisk.
+
+Running Señor Octopus
+=====================
+
+You can save the configuration above to a file called ``speedtest.yaml`` and run:
 
 .. code-block:: bash
 

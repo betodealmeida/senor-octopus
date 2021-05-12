@@ -31,4 +31,4 @@ async def sms(
     async for event in stream:  # pragma: no cover
         _logger.debug(event)
         _logger.info("Sending SMS")
-        client.messages.create(body=str(event["value"]), from_=from_, to=to)
+        client.messages.create(body=str(event["value"]).strip(), from_=from_, to=to)

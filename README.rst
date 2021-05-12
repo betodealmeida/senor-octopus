@@ -51,7 +51,7 @@ Note that in YAML we need to quote attributes that start with an asterisk.
 Running Señor Octopus
 =====================
 
-You can save this to a file called ``speedtest.yaml`` and run:
+You can save the configuration above to a file called ``speedtest.yaml`` and run:
 
 .. code-block:: bash
 

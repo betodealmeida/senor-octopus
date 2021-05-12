@@ -29,7 +29,7 @@ async def jinja(stream: Stream, template: str) -> Stream:
     _logger.debug("Applying template to events")
     tmpl = Template(template)
     async for event in stream:  # pragma: no cover
-        value = tmpl.render(event=event)
+        value = tmpl.render(event=event).strip()
         if value:
             yield {
                 "timestamp": event["timestamp"],

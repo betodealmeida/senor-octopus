@@ -7,13 +7,13 @@ from typing_extensions import Literal
 
 _logger = logging.getLogger(__name__)
 
-api = TuyaApi()
-
 
 @lru_cache(maxsize=None)
-def authenticate(email: str, password: str, country: str, application: str) -> None:
+def authenticate(email: str, password: str, country: str, application: str) -> TuyaApi:
     _logger.debug("Authenticating")
+    api = TuyaApi()
     api.init(email, password, country, application)
+    return api
 
 
 async def tuya(
@@ -46,7 +46,7 @@ async def tuya(
     application
         The application code, either "tuya" or "smart_life"
     """
-    authenticate(email, password, country, application)
+    api = authenticate(email, password, country, application)
     devices = {d.name(): d for d in api.get_all_devices()}
     if device not in devices:
         valid = ", ".join(f'"{name}"' for name in devices)

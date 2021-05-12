@@ -36,7 +36,7 @@ The ``db`` node, on the other hand, listens to events from the ``speedtest`` nod
     db:
       flow: speedtest ->
 
-You can also use ``*`` as a wildcard, if you want a node to connect to all other nodes, or specify a list of nodes:
+We can also use ``*`` as a wildcard, if we want a node to connect to all other nodes, or specify a list of nodes:
 
 .. code-block:: yaml
 

@@ -2,11 +2,12 @@
 Changelog
 =========
 
-Version 0.1.14 - 2021-MM-DD
+Version 0.1.14 - 2021-05-20
 ===========================
 
 - New filter: Jinja2 template
 - New sink: Twilio SMS
+- MQTT source now reconnects
 
 Version 0.1.13 - 2021-05-10
 ===========================

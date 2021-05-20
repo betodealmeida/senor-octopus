@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 from datetime import datetime
@@ -7,6 +8,7 @@ from typing import List
 from typing import Optional
 
 from asyncio_mqtt import Client
+from asyncio_mqtt import MqttError
 from paho.mqtt.client import MQTTMessage
 from senor_octopus.lib import merge_streams
 from senor_octopus.types import Stream
@@ -14,6 +16,8 @@ from senor_octopus.types import Stream
 _logger = logging.getLogger(__name__)
 
 MessageStream = AsyncGenerator[MQTTMessage, None]
+
+reconnect_interval = 3
 
 
 async def mqtt(
@@ -53,14 +57,33 @@ async def mqtt(
     Event
         Events with data from MQTT messages
     """
-    _logger.info("Subscribing to MQTT topics")
+    _logger.info("Connecting to MQTT server")
 
-    async with Client(host, port, username=username, password=password) as client:
-        streams = [
-            read_from_topic(client, topic, prefix, message_is_json) for topic in topics
-        ]
-        async for event in merge_streams(*streams):
-            yield event
+    while True:
+        try:
+            async with Client(
+                host,
+                port,
+                username=username,
+                password=password,
+                client_id=prefix,  # XXX
+                clean_session=False,
+            ) as client:
+                streams = [
+                    read_from_topic(client, topic, prefix, message_is_json)
+                    for topic in topics
+                ]
+                async for event in merge_streams(*streams):  # pragma: no cover
+                    yield event
+        except MqttError as error:
+            _logger.warning(
+                'Error "%s". Reconnecting in %s seconds.',
+                error,
+                reconnect_interval,
+            )
+            await asyncio.sleep(reconnect_interval)
+        except asyncio.CancelledError:
+            break
 
 
 async def read_from_topic(
@@ -71,7 +94,7 @@ async def read_from_topic(
 ) -> Stream:
     async with client.filtered_messages(topic) as messages:
         _logger.debug("Subscribing to topic: %s", topic)
-        await client.subscribe(topic)
+        await client.subscribe(topic, qos=1)
         async for message in messages:  # pragma: no cover
             value = message.payload.decode()
             if message_is_json:

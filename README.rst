@@ -2,6 +2,9 @@
 senor-octopus
 =============
 
+.. image:: https://coveralls.io/repos/github/betodealmeida/senor-octopus/badge.svg?branch=main
+   :target: https://coveralls.io/github/betodealmeida/senor-octopus?branch=main
+
 They say there are only 2 kinds of work: you either move information from one place to another, or you move mass from one place to another.
 
 **Señor Octopus is an application that moves data around**. It reads a YAML configuration file that describes how to connect **nodes**. For example, you might want to measure your internet speed every hour and store it in a database:

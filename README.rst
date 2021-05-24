@@ -3,7 +3,9 @@ senor-octopus
 =============
 
 .. image:: https://coveralls.io/repos/github/betodealmeida/senor-octopus/badge.svg?branch=main
-   :target: https://coveralls.io/github/betodealmeida/senor-octopus?branch=main
+   :target: https://coveralls.io/github/betodealmeida/senor-octopus?branch=main   
+.. image:: https://travis-ci.org/betodealmeida/senor-octopus.svg?branch=main
+   :target: https://travis-ci.org/betodealmeida/senor-octopus
 
 They say there are only 2 kinds of work: you either move information from one place to another, or you move mass from one place to another.
 

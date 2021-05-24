@@ -4,8 +4,9 @@ senor-octopus
 
 .. image:: https://coveralls.io/repos/github/betodealmeida/senor-octopus/badge.svg?branch=main
    :target: https://coveralls.io/github/betodealmeida/senor-octopus?branch=main   
-.. image:: https://travis-ci.org/betodealmeida/senor-octopus.svg?branch=main
-   :target: https://travis-ci.org/betodealmeida/senor-octopus
+.. image:: https://img.shields.io/cirrus/github/betodealmeida/senor-octopus
+   :target: https://cirrus-ci.com/github/betodealmeida/senor-octopus
+   :alt: Cirrus CI - Base Branch Build Status
 .. image:: https://badge.fury.io/py/senor-octopus.svg
    :target: https://badge.fury.io/py/senor-octopus
 .. image:: https://img.shields.io/pypi/pyversions/senor-octopus

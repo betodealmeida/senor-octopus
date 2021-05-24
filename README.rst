@@ -8,6 +8,8 @@ senor-octopus
    :target: https://travis-ci.org/betodealmeida/senor-octopus
 .. image:: https://badge.fury.io/py/senor-octopus.svg
    :target: https://badge.fury.io/py/senor-octopus
+.. image:: https://img.shields.io/pypi/pyversions/senor-octopus
+   :alt: PyPI - Python Version
     
 They say there are only 2 kinds of work: you either move information from one place to another, or you move mass from one place to another.
 

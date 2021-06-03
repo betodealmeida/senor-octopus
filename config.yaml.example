@@ -86,9 +86,17 @@ sqla:
   schedule: 4/20 * * * *
   # See https://docs.sqlalchemy.org/en/14/core/engines.html
   uri: postgres://user:password@host:port/db
+  # Set this to true if using a sync engine
+  sync: false
   # The query MUST return the columns `name` and `value`, and optionally
   # `timestamp`.
-  sql: "SELECT dim1 AS name, COUNT(*) AS value FROM TABLE WHERE cond GROUP BY 1"
+  sql: >
+    SELECT
+      dim1 AS name,
+      COUNT(*) AS value
+    FROM TABLE
+    WHERE cond
+    GROUP BY 1
   prefix: hub.sqla
 
 # Fetch stock price form Yahoo! Finance.
@@ -145,7 +153,7 @@ sun:
 # by applying string formatting to it.
 format:
   plugin: filter.format
-  flow: * -> *
+  flow: "* -> *"
   # Wraps the original name in a warning message
   name: "Warning ({name})"
   # Reduce precision of value to 2 decimalas
@@ -162,6 +170,18 @@ jpath:
   # Pass only events from random with value > 0.5
   filter: '$.events[?(@.name=="hub.random" and @.value>0.5)]'
 
+# The Jinja2 filter is probably the best way to filter and format
+# events
+jinja:
+  plugin: filter.jinja
+  flow: "* -> *"
+  # Drop any events where the value <= 10. If value > 10, return a
+  # new event with "Greater than 10" as the new value.
+  template: >
+    {% if event['value'] > 10 %}
+      Greater than 10
+    {% endif %}
+
 #########
 # Sinks #
 #########
@@ -170,13 +190,13 @@ jpath:
 # level.
 log:
   plugin: sink.log
-  flow: * ->
+  flow: "* ->"
   level = info
 
 # The MQTT sink is used to send events to an MQTT topic.
 mqtt_sink:
   plugin: sink.mqtt
-  flow: * ->
+  flow: "* ->"
   topic: test/1
   host: localhost
   port: 1883
@@ -194,7 +214,7 @@ mqtt_sink:
 # You need to sign up for their API (https://pushover.net/api).
 pushover:
   plugin: sink.pushover
-  flow: * ->
+  flow: "* ->"
   # Throttle will ensure that notifications are sent at most once
   # in a given time window. It can be used with any sink.
   throttle: 30 minutes
@@ -204,7 +224,7 @@ pushover:
 # The Postgres sink can be used to write events into a database.
 postgres:
   plugin: sink.db.postgresql
-  flow: * ->
+  flow: "* ->"
   # Batch will store all events in a queue until for a given time,
   # and then process all of them at once. Queued events are 
   # processed if the application is termined gracefully. This
@@ -216,3 +236,12 @@ postgres:
   port: 5432
   dbname: dbname
   table: events
+
+# Send notifications via Twilio
+sms:
+  plugin: sink.sms
+  flow: "* ->"
+  account_sid: XXX
+  auth_token: YYY
+  from: "+15558675309"
+  to: "+18002738255"

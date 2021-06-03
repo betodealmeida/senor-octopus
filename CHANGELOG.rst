@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.15 - 2021-06-03
+===========================
+
+- Make SQLAlchemy source work with sync engines
+
 Version 0.1.14 - 2021-05-20
 ===========================
 

@@ -1,15 +1,23 @@
 import logging
 from datetime import datetime
 from datetime import timezone
+from typing import Generator
 
+from senor_octopus.types import Event
 from senor_octopus.types import Stream
 from sqlalchemy import text
+from sqlalchemy.engine import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
 
 _logger = logging.getLogger(__name__)
 
 
-async def sqla(uri: str, sql: str, prefix: str = "hub.sqla") -> Stream:
+async def sqla(
+    uri: str,
+    sql: str,
+    sync: bool = False,
+    prefix: str = "hub.sqla",
+) -> Stream:
     """
     Read data from database.
 
@@ -36,7 +44,31 @@ async def sqla(uri: str, sql: str, prefix: str = "hub.sqla") -> Stream:
     _logger.info("Running SQL query")
     _logger.debug(sql)
 
+    if sync:
+        for event in read_sync(uri, sql, prefix):
+            yield event
+    else:
+        async for event in read_async(uri, sql, prefix):  # pragma: no cover
+            yield event
+
+
+def read_sync(uri: str, sql: str, prefix: str) -> Generator[Event, None, None]:
+    engine = create_engine(uri)
+
+    with engine.connect() as conn:
+        for row in conn.execute(text(sql)):
+            _logger.debug(row)
+            event = dict(row)
+            yield {
+                "timestamp": event.get("timestamp", datetime.now(timezone.utc)),
+                "name": f"{prefix}.{event['name']}",
+                "value": event["value"],
+            }
+
+
+async def read_async(uri: str, sql: str, prefix: str) -> Stream:
     engine = create_async_engine(uri)
+
     async with engine.connect() as conn:
         for row in await conn.execute(text(sql)):
             _logger.debug(row)

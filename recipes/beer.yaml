@@ -1,0 +1,46 @@
+# Get notified when 70% of adults in the US are partially vaccinated
+#
+# If this happens before July 4th you can sign up for a free beer:
+# https://news.yahoo.com/anheuser-busch-offer-biggest-beer-125058824.html
+#
+# Author: Beto Dealmeida <roberto@dealmeida.net>
+#
+#   * vaccination
+#   * threshold
+#   * sms
+
+# Read latest vaccination data from the CDC every hour; this requires
+# the `shillelagh` library (>=0.5.2).
+vaccination:
+  plugin: source.sqla
+  flow: -> threshold
+  schedule: 0 * * * *
+  uri: shillelagh://
+  sync: true
+  sql: >
+    SELECT
+      'Administered_Dose1_Recip_18PlusPop_Pct' AS name,
+      administered_dose1_recip_4 AS value
+    FROM "https://data.cdc.gov/resource/unsk-b7fc.json"
+    WHERE location = 'US'
+    ORDER BY date DESC
+    LIMIT 1
+
+# Filter events where 70% of adults have at least 1 shot.
+threshold:
+  plugin: filter.jinja
+  flow: vaccination -> sms
+  template: >
+    {% if event['value'] >= 70.0 %}
+      Go sign up for a free beer: https://mycooler.com/Beer
+    {% endif %}
+
+# Send SMS to register for free beer; you need to provide
+# a Twilio token.
+sms:
+  plugin: sink.sms
+  flow: threshold ->
+  account_sid: XXX
+  auth_token: YYY
+  from: "+15558675309"
+  to: "+18002738255"

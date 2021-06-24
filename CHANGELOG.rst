@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.1.16 - 2021-MM-DD
+===========================
+
+- New sink: send messages to Slack channel
+
 Version 0.1.15 - 2021-06-03
 ===========================
 

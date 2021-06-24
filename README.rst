@@ -342,5 +342,6 @@ These are the current sinks:
 - `sink.log <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/log.py>`_: Send events to a logger.
 - `sink.mqtt <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/mqtt.py>`_: Send events as messages to an MQTT topic.
 - `sink.pushover <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/pushover.py>`_: Send events to the Pushover mobile app.
+- `sink.slack <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/slack.py>`_: Send messages to a Slack channel.
 - `sink.sms <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/sms.py>`_: Send SMS via Twilio.
 - `sink.tuya <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sinks/tuya.py>`_: Send commands to a Tuya/Smart Life device.

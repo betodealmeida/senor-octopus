@@ -6,7 +6,7 @@ from senor_octopus.sources.rand import rand
 
 
 @pytest.mark.asyncio
-async def test_pushover(mocker) -> None:
+async def test_sms(mocker) -> None:
     Client = mocker.patch("senor_octopus.sinks.sms.Client")
     client = Client.return_value
 

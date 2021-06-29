@@ -132,7 +132,7 @@ class Sink(Node):
         if (
             self.last_run is not None
             and self.throttle
-            and loop.time() - self.last_run <= self.throttle
+            and loop.time() - self.last_run < self.throttle
         ):
             self._logger.info(
                 "Last run was %s, skipping this one due to throttle",

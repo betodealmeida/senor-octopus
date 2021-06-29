@@ -250,10 +250,20 @@ log:
         assert len(_logger.log.mock_calls) == 1
         assert sink.last_run == 0.0
 
-        await asyncio.sleep(150)
+        await asyncio.sleep(60)
         await source.run()
         assert len(_logger.log.mock_calls) == 2
-        assert sink.last_run == 210.0
+        assert sink.last_run == 120.0
+
+        await asyncio.sleep(90)
+        await source.run()
+        assert len(_logger.log.mock_calls) == 2
+        assert sink.last_run == 120.0
+
+        await asyncio.sleep(60)
+        await source.run()
+        assert len(_logger.log.mock_calls) == 3
+        assert sink.last_run == 270.0
 
 
 @pytest.mark.asyncio

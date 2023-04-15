@@ -1,3 +1,7 @@
+"""
+A sink that sends events to a Slack channel.
+"""
+
 import logging
 
 from slack_sdk import WebClient

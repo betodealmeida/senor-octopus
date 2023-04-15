@@ -1,3 +1,7 @@
+"""
+Tests for the MQTT source.
+"""
+
 import asyncio
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -12,6 +16,10 @@ from senor_octopus.sources.mqtt import mqtt
 
 @dataclass
 class FakeMessage:
+    """
+    Fake MQTT message.
+    """
+
     topic: str
     payload: bytes
 
@@ -19,6 +27,9 @@ class FakeMessage:
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_mqtt(mocker) -> None:
+    """
+    Tests for the source.
+    """
     vclock = aiotools.VirtualClock()
 
     async def gen(events, exception):
@@ -57,6 +68,7 @@ async def test_mqtt(mocker) -> None:
         asyncio.CancelledError("Canceled"),
     )
 
+    # pylint: disable=invalid-name
     Client = mocker.patch("senor_octopus.sources.mqtt.Client")
     Client.side_effect = [client1, client2, client3]
 
@@ -100,6 +112,9 @@ async def test_mqtt(mocker) -> None:
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_mqtt_multiple_topics(mocker) -> None:
+    """
+    Test that the source can listen to multiple topics.
+    """
     vclock = aiotools.VirtualClock()
 
     mock = mocker.patch("senor_octopus.sources.mqtt.Client")

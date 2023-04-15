@@ -1,3 +1,7 @@
+"""
+Tests for ``sink.pushover``.
+"""
+
 import random
 
 import pytest
@@ -8,6 +12,9 @@ from senor_octopus.sources.rand import rand
 
 @pytest.mark.asyncio
 async def test_pushover(httpx_mock) -> None:
+    """
+    Test the source.
+    """
     httpx_mock.add_response()
     random.seed(42)
 
@@ -22,6 +29,9 @@ async def test_pushover(httpx_mock) -> None:
 
 @pytest.mark.asyncio
 async def test_pushover_empty_stream(httpx_mock) -> None:
+    """
+    Test that nothing is sent when the stream is empty.
+    """
     random.seed(42)
 
     await pushover(rand(0), "XXX", "alice")

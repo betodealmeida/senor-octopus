@@ -1,3 +1,7 @@
+"""
+Tests for the Slack sink.
+"""
+
 import random
 
 import pytest
@@ -8,6 +12,10 @@ from senor_octopus.sources.rand import rand
 
 @pytest.mark.asyncio
 async def test_slack(mocker) -> None:
+    """
+    Tests for the sink.
+    """
+    # pylint: disable=invalid-name
     WebClient = mocker.patch("senor_octopus.sinks.slack.WebClient")
     client = WebClient.return_value
 

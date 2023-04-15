@@ -1,3 +1,7 @@
+"""
+Tests for the scheduler.
+"""
+
 import asyncio
 from unittest import mock
 
@@ -10,6 +14,9 @@ from senor_octopus.scheduler import Scheduler
 
 @pytest.mark.asyncio
 async def test_scheduler() -> None:
+    """
+    Basic tests.
+    """
     mock_source1 = mock.MagicMock()
     mock_source1.schedule.next.return_value = 10
     mock_source1.run = CoroutineMock()
@@ -31,6 +38,9 @@ async def test_scheduler() -> None:
 
 @pytest.mark.asyncio
 async def test_scheduler_short_long() -> None:
+    """
+    Test the scheduler with a short and a long job.
+    """
     mock_source1 = mock.MagicMock()
     mock_source1.schedule.next.return_value = 10
     mock_source1.run = CoroutineMock()
@@ -52,6 +62,9 @@ async def test_scheduler_short_long() -> None:
 
 @pytest.mark.asyncio
 async def test_scheduler_cancel() -> None:
+    """
+    Test that the schduler can be canceled.
+    """
     mock_source1 = mock.MagicMock()
     mock_source1.schedule.next.return_value = 10
     mock_source1.run = CoroutineMock()
@@ -73,6 +86,9 @@ async def test_scheduler_cancel() -> None:
 
 @pytest.mark.asyncio
 async def test_scheduler_no_jobs() -> None:
+    """
+    Test that the scheduler exists when there are no jobs.
+    """
     vclock = aiotools.VirtualClock()
     with vclock.patch_loop():
         scheduler = Scheduler({})  # type: ignore
@@ -81,6 +97,9 @@ async def test_scheduler_no_jobs() -> None:
 
 @pytest.mark.asyncio
 async def test_scheduler_exceptions(mocker) -> None:
+    """
+    Test that exceptions are properly logged.
+    """
     mock_source1 = mock.MagicMock()
     mock_source1.schedule.next.return_value = 10
     mock_source1.run = CoroutineMock()

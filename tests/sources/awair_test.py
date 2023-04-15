@@ -1,3 +1,7 @@
+"""
+Tests for the Awair source.
+"""
+
 from datetime import datetime, timezone
 
 import pytest
@@ -30,6 +34,9 @@ mock_payload = {
 
 @pytest.mark.asyncio
 async def test_awair(httpx_mock) -> None:
+    """
+    Tests for the source.
+    """
     httpx_mock.add_response(json=mock_payload)
 
     events = [event async for event in awair("XXX", 12345)]

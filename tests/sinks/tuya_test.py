@@ -1,3 +1,7 @@
+"""
+Tests for the Tuya sink.
+"""
+
 from datetime import datetime
 
 import pytest
@@ -7,7 +11,10 @@ from senor_octopus.types import Stream
 
 
 async def stream() -> Stream:
-    for value in {"on", "off", "invalid"}:
+    """
+    Define a simple stream of events.
+    """
+    for value in ("on", "off", "invalid"):
         yield {
             "timestamp": datetime(2021, 1, 1),
             "name": "turn",
@@ -17,6 +24,10 @@ async def stream() -> Stream:
 
 @pytest.mark.asyncio
 async def test_tuya(mocker) -> None:
+    """
+    Simple test.
+    """
+    # pylint: disable=invalid-name
     TuyaApi = mocker.patch("senor_octopus.sinks.tuya.TuyaApi")
     api = TuyaApi.return_value
     mock_device = mocker.MagicMock()
@@ -34,6 +45,10 @@ async def test_tuya(mocker) -> None:
 
 @pytest.mark.asyncio
 async def test_tuya_invalid_device(mocker) -> None:
+    """
+    Test that we handle invalid devices.
+    """
+    # pylint: disable=invalid-name
     TuyaApi = mocker.patch("senor_octopus.sinks.tuya.TuyaApi")
     api = TuyaApi.return_value
     mock_device = mocker.MagicMock()

@@ -1,3 +1,7 @@
+"""
+Tests for the Whistle source.
+"""
+
 from datetime import datetime, timezone
 
 import pytest
@@ -103,6 +107,9 @@ mock_payload = {
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_whistle() -> None:
+    """
+    Tests for the source.
+    """
     with aioresponses() as mock_response:
         mock_response.post(
             "https://app.whistle.com/api/login",
@@ -111,7 +118,6 @@ async def test_whistle() -> None:
         mock_response.get("https://app.whistle.com/api/pets", payload=mock_payload)
         events = [event async for event in whistle("username", "password")]
 
-    print(sorted(events, key=lambda e: e["name"]))
     assert sorted(events, key=lambda e: e["name"]) == [
         {
             "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),

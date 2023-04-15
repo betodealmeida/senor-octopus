@@ -1,15 +1,11 @@
 """
-    Dummy conftest.py for senor_octopus.
-
-    If you don't know what this is for, just leave it empty.
-    Read more about conftest.py under:
-    - https://docs.pytest.org/en/stable/fixture.html
-    - https://docs.pytest.org/en/stable/writing_plugins.html
+Pytest configuration.
 """
+
 import pytest
 import yaml
 
-config_content = """
+CONFIG_CONTENT = """
 random:
   plugin: source.random
   flow: -> check, normal
@@ -34,4 +30,7 @@ high:
 
 @pytest.fixture
 def mock_config():
-    yield yaml.load(config_content, Loader=yaml.SafeLoader)
+    """
+    Mock config for testing.
+    """
+    yield yaml.load(CONFIG_CONTENT, Loader=yaml.SafeLoader)

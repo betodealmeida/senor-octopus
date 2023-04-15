@@ -1,3 +1,7 @@
+"""
+Tests for ``source.crypto``.
+"""
+
 from datetime import datetime, timezone
 
 import pytest
@@ -11,6 +15,9 @@ mock_payloads = [{"BTC": {"USD": 55816.61}}, {"AUDIO": {"USD": 4.051}}]
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_crypto(mocker) -> None:
+    """
+    Tests for the source.
+    """
     mock = mocker.patch("senor_octopus.sources.crypto.cryptocompare")
 
     mock.get_price.side_effect = mock_payloads

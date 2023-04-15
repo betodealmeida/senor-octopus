@@ -1,3 +1,7 @@
+"""
+Tests for ``source.stock``.
+"""
+
 from datetime import datetime, timezone
 
 import pytest
@@ -9,6 +13,9 @@ from senor_octopus.sources.stock import stock
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_stock(mocker) -> None:
+    """
+    Tests for the source.
+    """
     mock = mocker.patch("senor_octopus.sources.stock.stockquotes")
     type(mock.Stock.return_value).current_price = mocker.PropertyMock(
         side_effect=[283.02, 64.51, 283.02, 64.51],

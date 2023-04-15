@@ -1,3 +1,7 @@
+"""
+Tests for ``source.sqla``.
+"""
+
 from datetime import datetime, timezone
 
 import pytest
@@ -18,6 +22,9 @@ results = [
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_sqla(mocker) -> None:
+    """
+    Test that the SQLA source works.
+    """
     mock = mocker.patch("senor_octopus.sources.sqla.create_async_engine")
     mock_conn = (
         mock.return_value.connect.return_value.__aenter__.return_value
@@ -43,6 +50,9 @@ async def test_sqla(mocker) -> None:
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_sqla_sync(mocker) -> None:
+    """
+    Test the SQLA source in synchronous mode.
+    """
     mock = mocker.patch("senor_octopus.sources.sqla.create_engine")
     mock_conn = (
         mock.return_value.connect.return_value.__enter__.return_value

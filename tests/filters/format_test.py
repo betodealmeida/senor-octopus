@@ -1,19 +1,26 @@
+"""
+Tests for the ``format`` filter.
+"""
+
 import random
 from datetime import datetime, timezone
 
 import pytest
 from freezegun import freeze_time
 
-from senor_octopus.filters.format import format
+from senor_octopus.filters.format import format as format_
 from senor_octopus.sources.rand import rand
 
 
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_format() -> None:
+    """
+    Tests for the filter.
+    """
     random.seed(42)
 
-    events = [event async for event in format(rand(2))]
+    events = [event async for event in format_(rand(2))]
     assert events == [
         {
             "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
@@ -29,7 +36,7 @@ async def test_format() -> None:
 
     events = [
         event
-        async for event in format(
+        async for event in format_(
             rand(2),
             name="random number",
             value="{value:.2f}",
@@ -51,7 +58,7 @@ async def test_format() -> None:
 
     events = [
         event
-        async for event in format(
+        async for event in format_(
             rand(2),
             value="{value:.2f}",
             eval_value=True,

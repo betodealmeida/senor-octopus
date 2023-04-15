@@ -1,3 +1,7 @@
+"""
+A source that reads data from an Awair Element monitor.
+"""
+
 import logging
 
 import dateutil.parser

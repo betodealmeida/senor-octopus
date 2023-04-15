@@ -1,3 +1,7 @@
+"""
+Tests for ``source.weatherapi``.
+"""
+
 import json
 import os
 from datetime import datetime, timezone
@@ -8,13 +12,16 @@ from freezegun import freeze_time
 from senor_octopus.sources.weatherapi import weatherapi
 
 dirname, filename = os.path.split(os.path.abspath(__file__))
-with open(os.path.join(dirname, "weatherapi_response.json")) as fp:
+with open(os.path.join(dirname, "weatherapi_response.json"), encoding="utf-8") as fp:
     mock_payload = json.load(fp)
 
 
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_weatherapi(httpx_mock) -> None:
+    """
+    Tests for the source.
+    """
     httpx_mock.add_response(json=mock_payload)
 
     events = [event async for event in weatherapi("XXX", "iceland")]

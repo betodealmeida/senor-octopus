@@ -1,3 +1,7 @@
+"""
+A simple source that generates random numbers.
+"""
+
 import random
 from datetime import datetime, timezone
 

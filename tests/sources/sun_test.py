@@ -1,3 +1,7 @@
+"""
+Tests for ``source.sun``.
+"""
+
 from datetime import datetime, timezone
 
 import aiotools
@@ -10,6 +14,9 @@ from senor_octopus.sources.sun import sun
 @freeze_time("2021-01-01T12:00:00-07:00")
 @pytest.mark.asyncio
 async def test_sun() -> None:
+    """
+    Basic tests.
+    """
     vclock = aiotools.VirtualClock()
 
     latitude = 38.3
@@ -29,6 +36,9 @@ async def test_sun() -> None:
 @freeze_time("2021-01-01T12:00:00-07:00")
 @pytest.mark.asyncio
 async def test_sun_east() -> None:
+    """
+    Test coordinates east of GMT.
+    """
     vclock = aiotools.VirtualClock()
 
     latitude = 51.21
@@ -48,6 +58,9 @@ async def test_sun_east() -> None:
 @freeze_time("2021-01-01T01:00:00-07:00")
 @pytest.mark.asyncio
 async def test_sun_early() -> None:
+    """
+    Test that the sunrise event is emitted on the same day.
+    """
     vclock = aiotools.VirtualClock()
 
     latitude = 38.3
@@ -67,6 +80,9 @@ async def test_sun_early() -> None:
 @freeze_time("2021-01-01T23:00:00-07:00")
 @pytest.mark.asyncio
 async def test_sun_late() -> None:
+    """
+    Test that the sunrise event is emitted on the next day.
+    """
     vclock = aiotools.VirtualClock()
 
     latitude = 38.3

@@ -1,3 +1,7 @@
+"""
+Tests for ``sink.log``.
+"""
+
 import logging
 import random
 from datetime import datetime, timezone
@@ -12,6 +16,9 @@ from senor_octopus.sources.rand import rand
 @pytest.mark.asyncio
 @freeze_time("2021-01-01")
 async def test_log(mocker) -> None:
+    """
+    Tests for the sink.
+    """
     _logger = mocker.patch("senor_octopus.sinks.log._logger")
     random.seed(42)
 

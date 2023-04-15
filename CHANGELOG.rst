@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Next
+====
+
+- Modernized the code base, testing with Python 3.10 and 3.11
+
 Version 0.1.16 - 2021-06-23
 ===========================
 

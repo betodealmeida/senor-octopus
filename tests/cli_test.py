@@ -1,3 +1,7 @@
+"""
+Tests for the CLI.
+"""
+
 import asyncio
 import logging
 import sys
@@ -10,6 +14,9 @@ from senor_octopus.cli import main, parse_args, run, setup_logging
 
 
 def test_parse_args() -> None:
+    """
+    Test ``parse_args``.
+    """
     with pytest.raises(SystemExit) as excinfo:
         parse_args(["--version"])
     assert str(excinfo.value) == "0"
@@ -23,7 +30,10 @@ def test_parse_args() -> None:
     assert parser.loglevel == logging.INFO
 
 
-def test_setup_logging(mocker, capfd) -> None:
+def test_setup_logging(mocker) -> None:
+    """
+    Test ``setup_logging``.
+    """
     mock_logging = mock.MagicMock()
     mocker.patch("senor_octopus.cli.logging", mock_logging)
 
@@ -39,6 +49,9 @@ def test_setup_logging(mocker, capfd) -> None:
 
 @pytest.mark.asyncio
 async def test_main(mocker) -> None:
+    """
+    Test ``main``.
+    """
     mocker.patch("senor_octopus.cli.yaml")
     mocker.patch("senor_octopus.cli.build_dag")
     mocker.patch("senor_octopus.cli.open")
@@ -54,6 +67,9 @@ async def test_main(mocker) -> None:
 
 @pytest.mark.asyncio
 async def test_main_canceled(mocker) -> None:
+    """
+    Test canceling the `main` function.
+    """
     mocker.patch("senor_octopus.cli.yaml")
     mocker.patch("senor_octopus.cli.build_dag")
     mocker.patch("senor_octopus.cli.open")
@@ -69,6 +85,9 @@ async def test_main_canceled(mocker) -> None:
 
 
 def test_run(mocker) -> None:
+    """
+    Test `run`.
+    """
     mock_main = CoroutineMock()
     mocker.patch("senor_octopus.cli.main", mock_main)
     mocker.patch("senor_octopus.cli.sys.argv", ["srocto", "config.yaml", "-vv"])
@@ -79,6 +98,9 @@ def test_run(mocker) -> None:
 
 
 def test_interrupt(mocker) -> None:
+    """
+    Test interrupting `run`.
+    """
     mock_main = CoroutineMock()
     mock_main.side_effect = KeyboardInterrupt()
     mocker.patch("senor_octopus.cli.main", mock_main)

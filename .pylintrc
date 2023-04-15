@@ -1,0 +1,10 @@
+[MESSAGES CONTROL]
+disable =
+  use-implicit-booleaness-not-comparison
+
+[MASTER]
+ignore=templates,docs
+disable =
+
+[TYPECHECK]
+ignored-modules=stockquotes

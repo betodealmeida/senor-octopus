@@ -1,3 +1,7 @@
+"""
+Tests for ``sink.mqtt``.
+"""
+
 import random
 
 import pytest
@@ -8,6 +12,9 @@ from senor_octopus.sources.rand import rand
 
 @pytest.mark.asyncio
 async def test_mqtt(mocker) -> None:
+    """
+    Tests for the sink.
+    """
     mock = mocker.patch("senor_octopus.sinks.mqtt.Client")
     mock__publish = (
         mock.return_value.__aenter__.return_value.publish

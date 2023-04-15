@@ -1,3 +1,7 @@
+"""
+Fetch price of cryptocurrencies from cryptocompare.com.
+"""
+
 import logging
 from datetime import datetime, timezone
 from typing import List

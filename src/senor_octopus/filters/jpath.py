@@ -1,3 +1,7 @@
+"""
+A filter that uses JSON Path to filter events.
+"""
+
 import logging
 
 from jsonpath import JSONPath
@@ -7,6 +11,7 @@ from senor_octopus.types import Stream
 _logger = logging.getLogger(__name__)
 
 
+# pylint: disable=redefined-builtin
 async def jsonpath(stream: Stream, filter: str) -> Stream:
     """
     Filter event stream based on a JSON path.

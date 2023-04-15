@@ -13,6 +13,10 @@ _logger = logging.getLogger(__name__)
 
 
 class WifiAccessPointType(TypedDict):
+    """
+    A WiFi access point.
+    """
+
     macAddress: str
     signalStrength: int
 
@@ -41,7 +45,11 @@ class MicronBoltMini2UDPProtocol(asyncio.DatagramProtocol):
     def connection_made(self, transport: asyncio.BaseTransport) -> None:
         self.transport = cast(asyncio.DatagramTransport, transport)
 
+    # pylint: disable=too-many-locals
     def datagram_received(self, data: bytes, addr: Tuple[str, int]) -> None:
+        """
+        Handle incoming data.
+        """
         if self.transport is None:
             return
 
@@ -79,6 +87,7 @@ class MicronBoltMini2UDPProtocol(asyncio.DatagramProtocol):
                 "https://www.googleapis.com/geolocation/v1/geolocate",
                 params={"key": self.api_key},
                 json=payload,
+                timeout=60,
             )
             if response.ok:
                 result = response.json()

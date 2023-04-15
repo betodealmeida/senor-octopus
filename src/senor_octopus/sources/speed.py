@@ -1,3 +1,7 @@
+"""
+Measure internet speed.
+"""
+
 import logging
 from datetime import datetime, timezone
 
@@ -26,13 +30,13 @@ async def speed(prefix: str = "hub.speedtest") -> Stream:
         Events with internet speed data
     """
     _logger.info("Testing internet speed")
-    s = speedtest.Speedtest()
-    s.get_best_server()
-    s.download()
-    s.upload()
-    _logger.debug("Received %s", s.results.dict())
+    client = speedtest.Speedtest()
+    client.get_best_server()
+    client.download()
+    client.upload()
+    _logger.debug("Received %s", client.results.dict())
 
-    for key, value in s.results.dict().items():
+    for key, value in client.results.dict().items():
         yield {
             "timestamp": datetime.now(timezone.utc),
             "name": f"{prefix}.{key}",

@@ -1,3 +1,7 @@
+"""
+A source that subscribes to one or more MQTT topics.
+"""
+
 import asyncio
 import json
 import logging
@@ -14,10 +18,8 @@ _logger = logging.getLogger(__name__)
 
 MessageStream = AsyncGenerator[MQTTMessage, None]
 
-reconnect_interval = 3
 
-
-async def mqtt(
+async def mqtt(  # pylint: disable=too-many-arguments
     topics: List[str],
     host: str = "localhost",
     port: int = 1883,
@@ -25,6 +27,7 @@ async def mqtt(
     password: Optional[str] = None,
     client_id: Optional[str] = None,
     message_is_json: bool = False,
+    reconnect_interval: int = 3,
     prefix: str = "hub.mqtt",
 ) -> Stream:
     """
@@ -49,6 +52,8 @@ async def mqtt(
         Optional client ID to use when connecting to the MQTT server
     message_is_json
         The MQTT message is encoded as JSON and should be parsed
+    reconnect_interval
+        Number of seconds to wait before reconnecting to the MQTT server
     prefix
         Prefix for events from this source
 
@@ -92,6 +97,9 @@ async def read_from_topic(
     prefix: str,
     message_is_json: bool,
 ) -> Stream:
+    """
+    Read from a given topic.
+    """
     async with client.filtered_messages(topic) as messages:
         _logger.debug("Subscribing to topic: %s", topic)
         await client.subscribe(topic, qos=1)
@@ -100,8 +108,8 @@ async def read_from_topic(
             if message_is_json:
                 try:
                     value = json.loads(value)
-                except Exception:
-                    pass
+                except json.decoder.JSONDecodeError:
+                    _logger.warning('Invalid JSON found: "%s"', value)
 
             yield {
                 "timestamp": datetime.now(timezone.utc),

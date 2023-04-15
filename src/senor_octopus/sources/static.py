@@ -1,3 +1,7 @@
+"""
+Simple source node that generates static events.
+"""
+
 from datetime import datetime, timezone
 
 from senor_octopus.types import Stream

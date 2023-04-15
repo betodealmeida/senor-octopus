@@ -1,3 +1,7 @@
+"""
+Tests for the DAP functions.
+"""
+
 import asyncio
 import random
 from typing import cast
@@ -11,6 +15,9 @@ from senor_octopus.graph import Sink, Source, build_dag, connected
 
 
 def test_connected() -> None:
+    """
+    Test the ``connected`` function.
+    """
     config = {
         "a": {"flow": "-> *"},
         "b": {"flow": "-> c"},
@@ -44,6 +51,9 @@ def test_connected() -> None:
 
 @pytest.mark.asyncio
 async def test_build_dag(mock_config) -> None:
+    """
+    The the ``build_dag`` function.
+    """
     dag = build_dag(mock_config)
     assert len(dag) == 1
 
@@ -54,6 +64,9 @@ async def test_build_dag(mock_config) -> None:
 
 @pytest.mark.asyncio
 async def test_build_dag_many_to_one() -> None:
+    """
+    Test ``build_dag`` with a many-to-one relationship.
+    """
     config = yaml.load(
         """
 one:
@@ -78,6 +91,9 @@ three:
 
 
 def test_build_dag_missing_plugin() -> None:
+    """
+    Test ``build_dag`` with a missing plugin.
+    """
     config = yaml.load(
         """
 a:
@@ -92,6 +108,9 @@ a:
 
 @pytest.mark.asyncio
 async def test_build_dag_seen() -> None:
+    """
+    Test that ``build_dag`` doesn't get stuck in a loop.
+    """
     config = yaml.load(
         """
 a:
@@ -112,6 +131,9 @@ c:
 
 
 def test_build_dag_missing_flow() -> None:
+    """
+    Test ``build_dag`` with a missing flow argument.
+    """
     config = yaml.load(
         """
 a:
@@ -125,6 +147,9 @@ a:
 
 
 def test_build_dag_invalid_plugin() -> None:
+    """
+    Test ``build_dag`` with an invalid plugin.
+    """
     config = yaml.load(
         """
 a:
@@ -141,6 +166,9 @@ a:
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_run_source(mocker, mock_config) -> None:
+    """
+    Test running sources.
+    """
     mock_logger = mocker.patch("senor_octopus.sinks.log._logger")
     random.seed(42)
 
@@ -157,6 +185,9 @@ async def test_run_source(mocker, mock_config) -> None:
 
 @pytest.mark.asyncio
 async def test_batch(mocker) -> None:
+    """
+    Test batch mode.
+    """
     mock_logger = mocker.patch("senor_octopus.sinks.log._logger")
     vclock = aiotools.VirtualClock()
 
@@ -188,6 +219,9 @@ log:
 
 @pytest.mark.asyncio
 async def test_batch_empty_source(mocker) -> None:
+    """
+    Test batch mode when no plugins are configured in batch mode.
+    """
     mock_logger = mocker.patch("senor_octopus.sinks.log._logger")
     vclock = aiotools.VirtualClock()
 
@@ -220,6 +254,9 @@ log:
 
 @pytest.mark.asyncio
 async def test_throttle(mocker) -> None:
+    """
+    Test throttle mode.
+    """
     _logger = mocker.patch("senor_octopus.sinks.log._logger")
     vclock = aiotools.VirtualClock()
 
@@ -274,6 +311,9 @@ log:
 
 @pytest.mark.asyncio
 async def test_throttle_without_events(mocker) -> None:
+    """
+    Test throttle mode when no events happen.
+    """
     _logger = mocker.patch("senor_octopus.sinks.log._logger")
     vclock = aiotools.VirtualClock()
 
@@ -308,6 +348,9 @@ log:
 
 @pytest.mark.asyncio
 async def test_batch_cancel(mocker) -> None:
+    """
+    Test that batch events are processed when the scheduler is canceled.
+    """
     mock_logger = mocker.MagicMock()
     mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
     vclock = aiotools.VirtualClock()

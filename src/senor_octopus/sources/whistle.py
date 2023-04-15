@@ -1,3 +1,7 @@
+"""
+A source for Whistle pet trackers.
+"""
+
 import logging
 from datetime import datetime, timezone
 

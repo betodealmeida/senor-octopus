@@ -1,3 +1,10 @@
+"""
+Main scheduler.
+
+The scheduler is responsible for running the DAG of nodes, calling scheduled
+source nodes and also running event-driven source nodes in the background.
+"""
+
 import asyncio
 import logging
 from typing import Awaitable, Dict, List, Set
@@ -15,18 +22,28 @@ async def log_exceptions(run: Awaitable[None]) -> None:
     """
     try:
         return await run
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         _logger.exception("Unhandled exception")
     return None
 
 
 class Scheduler:
+    """
+    A simple scheduler.
+
+    The scheduler will trigger event-driven source nodes in the background, and
+    also run scheduled source nodes.
+    """
+
     def __init__(self, dag: Set[Source]):
         self.dag = dag
         self.tasks: List[asyncio.Task] = []
         self.cancelled = False
 
     async def run(self) -> None:
+        """
+        Run the scheduler.
+        """
         if not self.dag:
             _logger.info("Nothing to run")
             return
@@ -65,6 +82,9 @@ class Scheduler:
             await asyncio.sleep(sleep_time)
 
     def cancel(self) -> None:
+        """
+        Cancel all running tasks.
+        """
         for task in self.tasks:
             task.cancel()
         self.cancelled = True

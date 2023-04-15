@@ -1,4 +1,7 @@
-# flake8: noqa
+"""
+Tests for the helper functions.
+"""
+
 import asyncio
 import random
 
@@ -8,10 +11,12 @@ import yaml
 
 from senor_octopus.graph import build_dag
 from senor_octopus.lib import flatten, merge_streams, render_dag
-from senor_octopus.sources.rand import rand
 
 
 def test_flatten() -> None:
+    """
+    Test the ``flatten`` function.
+    """
     assert flatten({"a": 1, "b": 2.0, "c": "foo", "d": {"e": "bar"}}) == {
         "a": 1,
         "b": 2.0,
@@ -22,6 +27,9 @@ def test_flatten() -> None:
 
 @pytest.mark.asyncio
 async def test_render_dag(mock_config) -> None:
+    """
+    Test the ``render_dag`` function.
+    """
     dag = build_dag(mock_config)
     assert (
         render_dag(dag, use_color=False).strip()
@@ -37,6 +45,9 @@ async def test_render_dag(mock_config) -> None:
 
 @pytest.mark.asyncio
 async def test_render_dag_many_to_many() -> None:
+    """
+    Test ``render_dag`` function with a DAG that has many-to-many relationship.
+    """
     config = yaml.load(
         """
 one:
@@ -76,12 +87,18 @@ four:
 
 @pytest.mark.asyncio
 async def test_merge_streams() -> None:
+    """
+    Test the ``merge_streams`` function.
+    """
     vclock = aiotools.VirtualClock()
 
     random.seed(42)
 
     async def gen(name, count, sleep):
-        for i in range(count):
+        """
+        Generate a stream of events.
+        """
+        for _ in range(count):
             await asyncio.sleep(sleep)
             yield (name, random.random())
 

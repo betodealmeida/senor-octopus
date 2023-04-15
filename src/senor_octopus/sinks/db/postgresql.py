@@ -1,3 +1,7 @@
+"""
+A Postgres sink.
+"""
+
 import logging
 import textwrap
 
@@ -10,7 +14,7 @@ from senor_octopus.types import Stream
 _logger = logging.getLogger(__name__)
 
 
-async def postgresql(
+async def postgresql(  # pylint: disable=too-many-arguments
     stream: Stream,
     user: str,
     password: str,

@@ -1,3 +1,7 @@
+"""
+Tests for the ``speedtest`` source.
+"""
+
 from datetime import datetime, timezone
 from unittest import mock
 
@@ -45,12 +49,14 @@ mock_payload = {
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_speed(mocker) -> None:
+    """
+    Tests for the source.
+    """
     mock_speedtest = mock.MagicMock()
     mock_speedtest.Speedtest.return_value.results.dict.return_value = mock_payload
     mocker.patch("senor_octopus.sources.speed.speedtest", mock_speedtest)
 
     events = [event async for event in speed()]
-    print(events)
     assert events == [
         {
             "timestamp": datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),

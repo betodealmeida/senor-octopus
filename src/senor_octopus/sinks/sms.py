@@ -1,3 +1,9 @@
+"""
+A simple SMS sink.
+
+This sink uses the Twilio API to send SMS messages.
+"""
+
 import logging
 
 from twilio.rest import Client
@@ -8,7 +14,11 @@ _logger = logging.getLogger(__name__)
 
 
 async def sms(
-    stream: Stream, account_sid: str, auth_token: str, to: str, **kwargs: str
+    stream: Stream,
+    account_sid: str,
+    auth_token: str,
+    to: str,  # pylint: disable=invalid-name
+    **kwargs: str,
 ) -> None:
     """
     Send SMS via Twilio.

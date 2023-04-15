@@ -1,3 +1,7 @@
+"""
+A generic source for reading data from a database via SQLAlchemy.
+"""
+
 import logging
 from datetime import datetime, timezone
 from typing import Generator
@@ -52,6 +56,9 @@ async def sqla(
 
 
 def read_sync(uri: str, sql: str, prefix: str) -> Generator[Event, None, None]:
+    """
+    Read data from database synchronously.
+    """
     engine = create_engine(uri)
 
     with engine.connect() as conn:
@@ -66,6 +73,9 @@ def read_sync(uri: str, sql: str, prefix: str) -> Generator[Event, None, None]:
 
 
 async def read_async(uri: str, sql: str, prefix: str) -> Stream:
+    """
+    Read data from database asynchronously.
+    """
     engine = create_async_engine(uri)
 
     async with engine.connect() as conn:

@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 
 import aiotools
 import pytest
+from asyncstdlib.builtins import anext as anext_
 from freezegun import freeze_time
 from pytest_mock import MockerFixture
 
@@ -60,4 +61,4 @@ async def test_udp_invalid_protocol(mocker: MockerFixture) -> None:
     mocker.patch("senor_octopus.sources.udp.main.asyncio")
 
     with pytest.raises(Exception, match='Protocol "DummyProtocol" not found'):
-        [event async for event in udp("DummyProtocol")]
+        await anext_(udp("DummyProtocol"))

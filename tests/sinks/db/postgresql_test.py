@@ -1,3 +1,7 @@
+"""
+Tests for ``sink.db.postgresql``.
+"""
+
 import random
 from datetime import datetime, timezone
 from unittest import mock
@@ -14,6 +18,9 @@ from senor_octopus.sources.rand import rand
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_postgresql(mocker) -> None:
+    """
+    Tests for the sink.
+    """
     mock_aiopg = CoroutineMock()
     pool = mock_aiopg.create_pool.return_value.__aenter__.return_value
     conn = pool.acquire.return_value.__aenter__.return_value
@@ -71,6 +78,9 @@ async def test_postgresql(mocker) -> None:
 
 @pytest.mark.asyncio
 async def test_postgresql_empty_stream(mocker) -> None:
+    """
+    Test that the sink works with an empty stream.
+    """
     mock_aiopg = CoroutineMock()
     pool = mock_aiopg.create_pool.return_value.__aenter__.return_value
     conn = pool.acquire.return_value.__aenter__.return_value

@@ -1,3 +1,7 @@
+"""
+A source that fetches data from WeatherAPI.
+"""
+
 import logging
 from datetime import datetime, timezone
 

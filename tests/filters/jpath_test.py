@@ -1,3 +1,7 @@
+"""
+Tests for the ``jsonpath`` filter.
+"""
+
 import random
 from datetime import datetime, timezone
 
@@ -11,6 +15,9 @@ from senor_octopus.sources.rand import rand
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
 async def test_jpath() -> None:
+    """
+    Tests for the filter.
+    """
     random.seed(42)
 
     filter_ = "$.events[?(@.value<0.5)]"

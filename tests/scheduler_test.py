@@ -7,23 +7,23 @@ from unittest import mock
 
 import aiotools
 import pytest
-from asynctest import CoroutineMock
+from pytest_mock import MockerFixture
 
 from senor_octopus.scheduler import Scheduler
 
 
 @pytest.mark.asyncio
-async def test_scheduler() -> None:
+async def test_scheduler(mocker: MockerFixture) -> None:
     """
     Basic tests.
     """
     mock_source1 = mock.MagicMock()
     mock_source1.schedule.next.return_value = 10
-    mock_source1.run = CoroutineMock()
+    mock_source1.run = mocker.AsyncMock()
     mock_source1.run.side_effect = [None, None]
     mock_source2 = mock.MagicMock()
     mock_source2.schedule = None
-    mock_source2.run = CoroutineMock()
+    mock_source2.run = mocker.AsyncMock()
     mock_dag = {mock_source1, mock_source2}
     vclock = aiotools.VirtualClock()
 
@@ -37,17 +37,17 @@ async def test_scheduler() -> None:
 
 
 @pytest.mark.asyncio
-async def test_scheduler_short_long() -> None:
+async def test_scheduler_short_long(mocker: MockerFixture) -> None:
     """
     Test the scheduler with a short and a long job.
     """
     mock_source1 = mock.MagicMock()
     mock_source1.schedule.next.return_value = 10
-    mock_source1.run = CoroutineMock()
+    mock_source1.run = mocker.AsyncMock()
     mock_source1.run.side_effect = [None, None]
     mock_source2 = mock.MagicMock()
     mock_source2.schedule.next.return_value = 120
-    mock_source2.run = CoroutineMock()
+    mock_source2.run = mocker.AsyncMock()
     mock_dag = {mock_source1, mock_source2}
     vclock = aiotools.VirtualClock()
 
@@ -61,13 +61,13 @@ async def test_scheduler_short_long() -> None:
 
 
 @pytest.mark.asyncio
-async def test_scheduler_cancel() -> None:
+async def test_scheduler_cancel(mocker: MockerFixture) -> None:
     """
     Test that the schduler can be canceled.
     """
     mock_source1 = mock.MagicMock()
     mock_source1.schedule.next.return_value = 10
-    mock_source1.run = CoroutineMock()
+    mock_source1.run = mocker.AsyncMock()
     mock_dag = {mock_source1}
     vclock = aiotools.VirtualClock()
 
@@ -102,7 +102,7 @@ async def test_scheduler_exceptions(mocker) -> None:
     """
     mock_source1 = mock.MagicMock()
     mock_source1.schedule.next.return_value = 10
-    mock_source1.run = CoroutineMock()
+    mock_source1.run = mocker.AsyncMock()
     mock_source1.run.side_effect = Exception("A wild error appeared!")
     mock_dag = {mock_source1}
     _logger = mocker.patch("senor_octopus.scheduler._logger")

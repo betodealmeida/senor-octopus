@@ -42,8 +42,6 @@ asyncio-mqtt==0.16.1
     # via senor-octopus
 asyncstdlib==3.10.6
     # via senor-octopus
-asynctest==0.13.0
-    # via senor-octopus
 attrs==22.2.0
     # via aiohttp
 beautifulsoup4==4.12.2

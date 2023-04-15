@@ -22,7 +22,6 @@ async def test_log(mocker) -> None:
     _logger = logging.getLogger()
     random.seed(42)
 
-
     await log(rand(0), level="INFO")
     _logger.log.asert_not_called()
 

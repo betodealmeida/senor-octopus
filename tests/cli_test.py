@@ -8,7 +8,6 @@ import sys
 from unittest import mock
 
 import pytest
-from asynctest import CoroutineMock
 
 from senor_octopus.cli import main, parse_args, run, setup_logging
 
@@ -57,7 +56,7 @@ async def test_main(mocker) -> None:
     mocker.patch("senor_octopus.cli.open")
 
     mock_scheduler = mock.MagicMock()
-    mock_scheduler.return_value.run = CoroutineMock()
+    mock_scheduler.return_value.run = mocker.AsyncMock()
     mocker.patch("senor_octopus.cli.Scheduler", mock_scheduler)
 
     await main(["config.yaml"])
@@ -75,7 +74,7 @@ async def test_main_canceled(mocker) -> None:
     mocker.patch("senor_octopus.cli.open")
 
     mock_scheduler = mock.MagicMock()
-    mock_scheduler.return_value.run = CoroutineMock()
+    mock_scheduler.return_value.run = mocker.AsyncMock()
     mock_scheduler.return_value.run.side_effect = asyncio.CancelledError("Canceled")
     mocker.patch("senor_octopus.cli.Scheduler", mock_scheduler)
 
@@ -88,7 +87,7 @@ def test_run(mocker) -> None:
     """
     Test `run`.
     """
-    mock_main = CoroutineMock()
+    mock_main = mocker.AsyncMock()
     mocker.patch("senor_octopus.cli.main", mock_main)
     mocker.patch("senor_octopus.cli.sys.argv", ["srocto", "config.yaml", "-vv"])
 
@@ -101,7 +100,7 @@ def test_interrupt(mocker) -> None:
     """
     Test interrupting `run`.
     """
-    mock_main = CoroutineMock()
+    mock_main = mocker.AsyncMock()
     mock_main.side_effect = KeyboardInterrupt()
     mocker.patch("senor_octopus.cli.main", mock_main)
     mocker.patch("senor_octopus.cli.sys.argv", ["srocto", "config.yaml", "-vv"])

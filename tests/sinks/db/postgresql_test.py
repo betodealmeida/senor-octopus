@@ -7,7 +7,6 @@ from datetime import datetime, timezone
 from unittest import mock
 
 import pytest
-from asynctest import CoroutineMock
 from freezegun import freeze_time
 from psycopg2 import sql
 
@@ -21,11 +20,11 @@ async def test_postgresql(mocker) -> None:
     """
     Tests for the sink.
     """
-    mock_aiopg = CoroutineMock()
+    mock_aiopg = mocker.AsyncMock()
     pool = mock_aiopg.create_pool.return_value.__aenter__.return_value
     conn = pool.acquire.return_value.__aenter__.return_value
     cursor = conn.cursor.return_value.__aenter__.return_value
-    cursor.execute = CoroutineMock()
+    cursor.execute = mocker.AsyncMock()
     mocker.patch("senor_octopus.sinks.db.postgresql.aiopg", mock_aiopg)
     random.seed(42)
 
@@ -81,11 +80,11 @@ async def test_postgresql_empty_stream(mocker) -> None:
     """
     Test that the sink works with an empty stream.
     """
-    mock_aiopg = CoroutineMock()
+    mock_aiopg = mocker.AsyncMock()
     pool = mock_aiopg.create_pool.return_value.__aenter__.return_value
     conn = pool.acquire.return_value.__aenter__.return_value
     cursor = conn.cursor.return_value.__aenter__.return_value
-    cursor.execute = CoroutineMock()
+    cursor.execute = mocker.AsyncMock()
     mocker.patch("senor_octopus.sinks.db.postgresql.aiopg", mock_aiopg)
     random.seed(42)
 

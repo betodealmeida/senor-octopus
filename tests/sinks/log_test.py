@@ -23,7 +23,7 @@ async def test_log(mocker) -> None:
     random.seed(42)
 
     await log(rand(0), level="INFO")
-    _logger.log.asert_not_called()
+    _logger.log.assert_not_called()
 
     await log(rand(1), level="INFO")
     _logger.log.assert_called_with(

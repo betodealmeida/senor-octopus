@@ -26,5 +26,5 @@ async def log(
         The logging level to be used
     """
     _logger = logging.getLogger(name)
-    async for event in stream:
+    async for event in stream:  # pragma: no cover
         _logger.log(getattr(logging, level.upper()), event)

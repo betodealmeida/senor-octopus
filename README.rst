@@ -214,8 +214,8 @@ We can use the ``jinja`` filter to ignore "sunrise" events, and to convert the "
 
 With this configuration the ``sunset`` filter will drop any events that don't have a value of "sunset". And for those events that have, the value will be replaced by the string "on" so it can activate the lights in the ``lights`` node.
 
-Throttling
-==========
+Throttling events
+=================
 
 Sometimes we want to limit the number of events being consumed by a sink. For example, imagine that we want to use Señor Octopus to monitor air quality using an `Awair Element <https://www.getawair.com/home/element>`_, sending us an SMS when the score is below a given threshold. We would like the SMS to be sent at most once every 30 minutes, and only between 8am and 10pm.
 
@@ -322,6 +322,7 @@ The current plugins for sources are:
 - `source.static <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/static.py>`_: Generate static events.
 - `source.stock <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/stock.py>`_: Fetch stock price form Yahoo! Finance.
 - `source.sun <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/sun.py>`_: Send events on sunrise and sunset.
+- `source.udp <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/udp/main.py>`_: Listens to UDP messages on a given port.
 - `source.weatherapi <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/weatherapi.py>`_: Fetch weather forecast data from weatherapi.com.
 - `source.whistle <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/sources/whistle.py>`_: Fetch device information and location for a Whistle pet tracker.
 

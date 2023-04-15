@@ -38,7 +38,7 @@ class Scheduler:
     def __init__(self, dag: Set[Source]):
         self.dag = dag
         self.tasks: List[asyncio.Task] = []
-        self.cancelled = False
+        self.canceled = False
 
     async def run(self) -> None:
         """
@@ -59,7 +59,7 @@ class Scheduler:
 
         schedule_nodes = {node for node in self.dag if node.schedule}
         schedules: Dict[str, float] = {}
-        while not self.cancelled:
+        while not self.canceled:
             for node in schedule_nodes:
                 now = loop.time()
                 delay = node.schedule.next(default_utc=False)
@@ -87,4 +87,4 @@ class Scheduler:
         """
         for task in self.tasks:
             task.cancel()
-        self.cancelled = True
+        self.canceled = True

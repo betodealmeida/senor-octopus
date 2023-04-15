@@ -2,37 +2,65 @@
 Tests for ``sink.db.postgresql``.
 """
 
+# pylint: disable=redefined-outer-name
+
 import random
 from datetime import datetime, timezone
-from unittest import mock
+from typing import AsyncGenerator
+from unittest.mock import ANY, AsyncMock, call
 
 import pytest
+import pytest_asyncio
 from freezegun import freeze_time
 from psycopg2 import sql
+from pytest_mock import MockerFixture
 
 from senor_octopus.sinks.db.postgresql import postgresql
 from senor_octopus.sources.rand import rand
 
 
+class AsyncContextManager:
+    """
+    Mock an async context manager.
+    """
+
+    async def __aenter__(self):
+        pass
+
+    async def __aexit__(self, exc_type, exc, traceback):
+        pass
+
+
+@pytest_asyncio.fixture
+async def cursor(mocker: MockerFixture) -> AsyncGenerator[AsyncMock, None]:
+    """
+    Mock a cursor.
+    """
+    aiopg = mocker.MagicMock()
+    aiopg.create_pool = mocker.MagicMock(AsyncContextManager)
+    pool = aiopg.create_pool().__aenter__.return_value
+    pool.acquire = mocker.MagicMock(AsyncContextManager)
+    conn = pool.acquire().__aenter__.return_value
+    conn.cursor = mocker.MagicMock(AsyncContextManager)
+    cursor = conn.cursor().__aenter__.return_value
+
+    mocker.patch("senor_octopus.sinks.db.postgresql.aiopg", aiopg)
+    yield cursor
+
+
 @freeze_time("2021-01-01")
 @pytest.mark.asyncio
-async def test_postgresql(mocker) -> None:
+async def test_postgresql(cursor: AsyncMock) -> None:
     """
     Tests for the sink.
     """
-    mock_aiopg = mocker.AsyncMock()
-    pool = mock_aiopg.create_pool.return_value.__aenter__.return_value
-    conn = pool.acquire.return_value.__aenter__.return_value
-    cursor = conn.cursor.return_value.__aenter__.return_value
-    cursor.execute = mocker.AsyncMock()
-    mocker.patch("senor_octopus.sinks.db.postgresql.aiopg", mock_aiopg)
     random.seed(42)
 
     await postgresql(rand(1), "user", "password", "host", 5432, "dbname")
 
     cursor.execute.assert_has_calls(
         [
-            mock.call(
+            call(
                 sql.Composed(
                     [
                         sql.SQL("\nCREATE TABLE IF NOT EXISTS "),
@@ -44,7 +72,7 @@ async def test_postgresql(mocker) -> None:
                     ],
                 ),
             ),
-            mock.call(
+            call(
                 sql.Composed(
                     [
                         sql.SQL("\nCREATE INDEX IF NOT EXISTS "),
@@ -55,7 +83,7 @@ async def test_postgresql(mocker) -> None:
                     ],
                 ),
             ),
-            mock.call(
+            call(
                 sql.Composed(
                     [
                         sql.SQL("\nINSERT INTO "),
@@ -68,7 +96,7 @@ async def test_postgresql(mocker) -> None:
                 (
                     datetime(2021, 1, 1, 0, 0, tzinfo=timezone.utc),
                     "hub.random",
-                    mock.ANY,  # Json(0.6394267984578837)
+                    ANY,  # Json(0.6394267984578837)
                 ),
             ),
         ],
@@ -76,17 +104,12 @@ async def test_postgresql(mocker) -> None:
 
 
 @pytest.mark.asyncio
-async def test_postgresql_empty_stream(mocker) -> None:
+async def test_postgresql_empty_stream(cursor: AsyncMock) -> None:
     """
     Test that the sink works with an empty stream.
     """
-    mock_aiopg = mocker.AsyncMock()
-    pool = mock_aiopg.create_pool.return_value.__aenter__.return_value
-    conn = pool.acquire.return_value.__aenter__.return_value
-    cursor = conn.cursor.return_value.__aenter__.return_value
-    cursor.execute = mocker.AsyncMock()
-    mocker.patch("senor_octopus.sinks.db.postgresql.aiopg", mock_aiopg)
     random.seed(42)
 
     await postgresql(rand(0), "user", "password", "host", 5432, "dbname")
-    assert len(cursor.execute.mock_calls) == 2
+
+    assert cursor.execute.call_count == 2

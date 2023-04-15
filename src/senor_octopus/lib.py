@@ -74,15 +74,19 @@ def build_asciidag(
     return asciidag_node
 
 
+# pylint: disable=unsubscriptable-object
+EventFuture = Future[Event]
+
+
 async def merge_streams(*streams: Stream) -> Stream:
     """
     Merge multiple streams into a single stream.
     """
     streams_next: Dict[
         Stream,
-        Optional[Future[Event]],
+        Optional[EventFuture],
     ] = {stream: None for stream in streams}
-    stream_map: Dict[Future[Event], Stream] = {}
+    stream_map: Dict[EventFuture, Stream] = {}
     while streams_next:
         for stream, next_ in streams_next.items():
             if next_ is None:

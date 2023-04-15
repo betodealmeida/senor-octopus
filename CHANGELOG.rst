@@ -5,7 +5,9 @@ Changelog
 Next
 ====
 
-- Modernized the code base, testing with Python 3.10 and 3.11
+- Modernize the code base, testing with Python 3.10 and 3.11
+- Add UDP server with support for custom protocols
+- Add protocol for the Micron Bolt Mini 2 GPS tracker
 
 Version 0.1.16 - 2021-06-23
 ===========================

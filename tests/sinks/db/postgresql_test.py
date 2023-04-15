@@ -1,12 +1,12 @@
 import random
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 from unittest import mock
 
 import pytest
 from asynctest import CoroutineMock
 from freezegun import freeze_time
 from psycopg2 import sql
+
 from senor_octopus.sinks.db.postgresql import postgresql
 from senor_octopus.sources.rand import rand
 

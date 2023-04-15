@@ -1,21 +1,13 @@
 import asyncio
 from asyncio.futures import Future
 from io import StringIO
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Set
-from typing import Tuple
-from typing import Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import asciidag.graph
 import asciidag.node
 
-from senor_octopus.graph import Node
-from senor_octopus.graph import Source
-from senor_octopus.types import Event
-from senor_octopus.types import Stream
+from senor_octopus.graph import Node, Source
+from senor_octopus.types import Event, Stream
 
 
 def flatten(

@@ -4,6 +4,7 @@ from unittest import mock
 import aiotools
 import pytest
 from asynctest import CoroutineMock
+
 from senor_octopus.scheduler import Scheduler
 
 

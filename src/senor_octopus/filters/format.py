@@ -28,7 +28,7 @@ async def format(
     value
         A string formatted with the original event that replaces the value
     eval_value
-        Wether the new value should be evaluated
+        Whether the new value should be evaluated
 
     Yields
     ------

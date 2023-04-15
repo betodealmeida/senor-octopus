@@ -3,7 +3,7 @@ senor-octopus
 =============
 
 .. image:: https://coveralls.io/repos/github/betodealmeida/senor-octopus/badge.svg?branch=main
-   :target: https://coveralls.io/github/betodealmeida/senor-octopus?branch=main   
+   :target: https://coveralls.io/github/betodealmeida/senor-octopus?branch=main
 .. image:: https://img.shields.io/cirrus/github/betodealmeida/senor-octopus
    :target: https://cirrus-ci.com/github/betodealmeida/senor-octopus
    :alt: Cirrus CI - Base Branch Build Status
@@ -11,7 +11,7 @@ senor-octopus
    :target: https://badge.fury.io/py/senor-octopus
 .. image:: https://img.shields.io/pypi/pyversions/senor-octopus
    :alt: PyPI - Python Version
-    
+
 They say there are only 2 kinds of work: you either move information from one place to another, or you move mass from one place to another.
 
 **Señor Octopus is an application that moves data around**. It reads a YAML configuration file that describes how to connect **nodes**. For example, you might want to measure your internet speed every hour and store it in a database:
@@ -31,7 +31,7 @@ They say there are only 2 kinds of work: you either move information from one pl
       host: localhost
       port: 5432
       dbname: default
-      
+
 Nodes are connected by the ``flow`` attribute. The ``speedtest`` node is connected to the ``db`` node because it points to it:
 
 .. code-block:: yaml
@@ -52,10 +52,10 @@ We can also use ``*`` as a wildcard, if we want a node to connect to all other n
 
     speedtest:
       flow: -> db, log
-      
+
     db:
       flow: "* ->"
-      
+
 Note that in YAML we need to quote attributes that start with an asterisk.
 
 Running Señor Octopus
@@ -83,7 +83,7 @@ Señor Octopus uses a very simple but flexible data model to move data around. W
         timestamp: datetime
         name: str
         value: Any
-    
+
 An event has a **timestamp** associated with it, a **name**, and a **value**. Note that the value can be anything!
 
 A **source** will produce a stream of events. In the example above, once per hour the ``speedtest`` source will produce events like these:
@@ -230,7 +230,7 @@ Here's how we can do that:
       access_token: XXX
       device_type: awair-element
       device_id: 12345
-    
+
     bad_air:
       plugin: filter.jinja
       flow: awair -> sms
@@ -243,7 +243,7 @@ Here's how we can do that:
         %}
           Air quality score is low: {{ event['value'] }}
         {% endif %}
-    
+
     sms:
       plugin: sink.sms
       flow: bad_air ->

@@ -1,13 +1,6 @@
 import asyncio
 import logging
-from typing import Any
-from typing import cast
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Set
-from typing import Tuple
-from typing import Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 
 from asyncstdlib import itertools
 from asyncstdlib.builtins import aiter
@@ -15,12 +8,14 @@ from crontab import CronTab
 from durations import Duration
 from pkg_resources import iter_entry_points
 
-from senor_octopus.types import Event
-from senor_octopus.types import FilterCallable
-from senor_octopus.types import LoggerCallable
-from senor_octopus.types import SinkCallable
-from senor_octopus.types import SourceCallable
-from senor_octopus.types import Stream
+from senor_octopus.types import (
+    Event,
+    FilterCallable,
+    LoggerCallable,
+    SinkCallable,
+    SourceCallable,
+    Stream,
+)
 
 
 async def log_events(stream: Stream, flow: str, log: LoggerCallable) -> Stream:

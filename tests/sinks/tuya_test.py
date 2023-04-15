@@ -1,6 +1,7 @@
 from datetime import datetime
 
 import pytest
+
 from senor_octopus.sinks.tuya import tuya
 from senor_octopus.types import Stream
 

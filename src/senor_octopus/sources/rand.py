@@ -1,6 +1,5 @@
 import random
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 from senor_octopus.types import Stream
 

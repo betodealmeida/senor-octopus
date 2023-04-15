@@ -1,10 +1,10 @@
 import json
 import os
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 import pytest
 from freezegun import freeze_time
+
 from senor_octopus.sources.weatherapi import weatherapi
 
 dirname, filename = os.path.split(os.path.abspath(__file__))

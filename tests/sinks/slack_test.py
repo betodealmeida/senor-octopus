@@ -1,6 +1,7 @@
 import random
 
 import pytest
+
 from senor_octopus.sinks.slack import slack
 from senor_octopus.sources.rand import rand
 

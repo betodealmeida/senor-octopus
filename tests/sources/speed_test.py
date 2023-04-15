@@ -1,9 +1,9 @@
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 from unittest import mock
 
 import pytest
 from freezegun import freeze_time
+
 from senor_octopus.sources.speed import speed
 
 mock_payload = {

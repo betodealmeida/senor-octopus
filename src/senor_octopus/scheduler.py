@@ -1,9 +1,6 @@
 import asyncio
 import logging
-from typing import Awaitable
-from typing import Dict
-from typing import List
-from typing import Set
+from typing import Awaitable, Dict, List, Set
 
 from senor_octopus.graph import Source
 

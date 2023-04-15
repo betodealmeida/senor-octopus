@@ -9,7 +9,6 @@
 import pytest
 import yaml
 
-
 config_content = """
 random:
   plugin: source.random

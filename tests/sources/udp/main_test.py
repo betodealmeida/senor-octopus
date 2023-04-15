@@ -27,7 +27,7 @@ async def test_udp(mocker: MockerFixture) -> None:
         side_effect=[
             {"foo": "bar"},
             asyncio.CancelledError("Canceled"),
-        ]
+        ],
     )
     loop = mock_asyncio.get_running_loop.return_value = mocker.AsyncMock()
     transport = mocker.MagicMock()
@@ -43,7 +43,7 @@ async def test_udp(mocker: MockerFixture) -> None:
             "name": "hub.udp.message",
             "timestamp": datetime(2022, 1, 1, 19, 0, tzinfo=timezone.utc),
             "value": {"foo": "bar"},
-        }
+        },
     ]
 
 

@@ -1,8 +1,8 @@
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 import pytest
 from freezegun import freeze_time
+
 from senor_octopus.sources.crypto import crypto
 
 mock_payloads = [{"BTC": {"USD": 55816.61}}, {"AUDIO": {"USD": 4.051}}]

@@ -1,9 +1,7 @@
 from datetime import datetime
-from typing import Any
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator
 
-from typing_extensions import Protocol
-from typing_extensions import TypedDict
+from typing_extensions import Protocol, TypedDict
 
 
 class Event(TypedDict):

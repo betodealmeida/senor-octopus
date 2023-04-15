@@ -1,9 +1,9 @@
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 import pytest
 from aioresponses import aioresponses
 from freezegun import freeze_time
+
 from senor_octopus.sources.whistle import whistle
 
 mock_payload = {

@@ -1,6 +1,7 @@
 import random
 
 import pytest
+
 from senor_octopus.sinks.sms import sms
 from senor_octopus.sources.rand import rand
 

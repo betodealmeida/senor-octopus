@@ -29,7 +29,7 @@ async def test_micron_bolt_mini_2_no_connection(mocker: MockerFixture):
 @pytest.mark.asyncio
 async def test_micron_bolt_mini_2_hearbeat(mocker: MockerFixture):
     """
-    Test protocol hearbeat.
+    Test protocol heartbeat.
     """
     queue = asyncio.Queue()
     protocol = MicronBoltMini2UDPProtocol(queue)
@@ -139,9 +139,9 @@ async def test_micron_bolt_mini_2_wifi_not_found(
                         "message": "Not Found",
                         "domain": "geolocation",
                         "reason": "notFound",
-                    }
+                    },
                 ],
-            }
+            },
         },
         status_code=404,
     )

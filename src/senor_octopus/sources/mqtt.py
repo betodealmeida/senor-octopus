@@ -1,14 +1,10 @@
 import asyncio
 import json
 import logging
-from datetime import datetime
-from datetime import timezone
-from typing import AsyncGenerator
-from typing import List
-from typing import Optional
+from datetime import datetime, timezone
+from typing import AsyncGenerator, List, Optional
 
-from asyncio_mqtt import Client
-from asyncio_mqtt import MqttError
+from asyncio_mqtt import Client, MqttError
 from paho.mqtt.client import MQTTMessage
 
 from senor_octopus.lib import merge_streams

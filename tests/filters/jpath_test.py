@@ -1,9 +1,9 @@
 import random
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 import pytest
 from freezegun import freeze_time
+
 from senor_octopus.filters.jpath import jsonpath
 from senor_octopus.sources.rand import rand
 

@@ -68,7 +68,7 @@ class MicronBoltMini2UDPProtocol(asyncio.DatagramProtocol):
                     {
                         "macAddress": re.sub(r"(..)", r"\1:", mac_address),
                         "signalStrength": int(signal_strength),
-                    }
+                    },
                 )
 
             payload = {

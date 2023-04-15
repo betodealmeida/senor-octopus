@@ -5,10 +5,8 @@ from unittest import mock
 
 import pytest
 from asynctest import CoroutineMock
-from senor_octopus.cli import main
-from senor_octopus.cli import parse_args
-from senor_octopus.cli import run
-from senor_octopus.cli import setup_logging
+
+from senor_octopus.cli import main, parse_args, run, setup_logging
 
 
 def test_parse_args() -> None:

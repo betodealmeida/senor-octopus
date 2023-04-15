@@ -1,10 +1,10 @@
 import logging
 import random
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 import pytest
 from freezegun import freeze_time
+
 from senor_octopus.sinks.log import log
 from senor_octopus.sources.rand import rand
 

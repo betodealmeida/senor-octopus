@@ -1,9 +1,9 @@
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 import aiotools
 import pytest
 from freezegun import freeze_time
+
 from senor_octopus.sources.sun import sun
 
 

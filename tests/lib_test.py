@@ -5,10 +5,9 @@ import random
 import aiotools
 import pytest
 import yaml
+
 from senor_octopus.graph import build_dag
-from senor_octopus.lib import flatten
-from senor_octopus.lib import merge_streams
-from senor_octopus.lib import render_dag
+from senor_octopus.lib import flatten, merge_streams, render_dag
 from senor_octopus.sources.rand import rand
 
 
@@ -28,7 +27,7 @@ async def test_render_dag(mock_config) -> None:
         render_dag(dag, use_color=False).strip()
         == r"""
 *   random
-|\  
+|\
 * | check
 | * normal
 * high
@@ -66,10 +65,10 @@ four:
         render_dag(dag, use_color=False).strip()
         == r"""
 *   one
-|\  
+|\
 * | three
 | * two
-|/  
+|/
 * four
         """.strip()
     )

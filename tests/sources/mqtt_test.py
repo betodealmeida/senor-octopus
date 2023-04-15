@@ -1,12 +1,12 @@
 import asyncio
 from dataclasses import dataclass
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 import aiotools
 import pytest
 from asyncio_mqtt import MqttError
 from freezegun import freeze_time
+
 from senor_octopus.sources.mqtt import mqtt
 
 

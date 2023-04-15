@@ -48,7 +48,7 @@ Version 0.1.11 - 2021-05-05
 Version 0.1.10 - 2021-03-29
 ===========================
 
-- Modified scheduler to run tasks concurrently 
+- Modified scheduler to run tasks concurrently
 - Modified scheduler to gracefully cancel tasks
 - Added support for event-driven sources (non-scheduled)
 - New sources: Whistle, stocks, crypto, mqtt

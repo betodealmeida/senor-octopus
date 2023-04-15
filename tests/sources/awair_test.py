@@ -1,7 +1,7 @@
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 import pytest
+
 from senor_octopus.sources.awair import awair
 
 mock_payload = {

@@ -6,10 +6,8 @@ import aiotools
 import pytest
 import yaml
 from freezegun import freeze_time
-from senor_octopus.graph import build_dag
-from senor_octopus.graph import connected
-from senor_octopus.graph import Sink
-from senor_octopus.graph import Source
+
+from senor_octopus.graph import Sink, Source, build_dag, connected
 
 
 def test_connected() -> None:

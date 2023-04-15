@@ -46,7 +46,7 @@ async def udp(
 
     try:
         protocol_class = next(
-            iter_entry_points("senor_octopus.source.udp.protocols", protocol)
+            iter_entry_points("senor_octopus.source.udp.protocols", protocol),
         ).load()
     except StopIteration as ex:
         raise Exception(f'Protocol "{protocol}" not found') from ex

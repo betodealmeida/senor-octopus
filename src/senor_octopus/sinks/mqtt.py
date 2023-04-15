@@ -2,6 +2,7 @@ import logging
 from typing import Optional
 
 from asyncio_mqtt import Client
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)

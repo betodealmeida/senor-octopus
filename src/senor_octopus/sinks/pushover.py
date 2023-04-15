@@ -1,6 +1,7 @@
 import logging
 
 import httpx
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)

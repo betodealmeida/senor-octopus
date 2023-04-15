@@ -8,7 +8,6 @@
 """
 import pytest
 import yaml
-from senor_octopus.graph import build_dag
 
 
 config_content = """
@@ -36,10 +35,4 @@ high:
 
 @pytest.fixture
 def mock_config():
-    yield yaml.load(config_content)
-
-
-@pytest.fixture
-async def mock_dag(mock_config):
-    dag = build_dag(mock_config)
-    yield dag
+    yield yaml.load(config_content, Loader=yaml.SafeLoader)

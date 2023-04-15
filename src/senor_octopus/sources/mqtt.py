@@ -10,6 +10,7 @@ from typing import Optional
 from asyncio_mqtt import Client
 from asyncio_mqtt import MqttError
 from paho.mqtt.client import MQTTMessage
+
 from senor_octopus.lib import merge_streams
 from senor_octopus.types import Stream
 
@@ -26,6 +27,7 @@ async def mqtt(
     port: int = 1883,
     username: Optional[str] = None,
     password: Optional[str] = None,
+    client_id: Optional[str] = None,
     message_is_json: bool = False,
     prefix: str = "hub.mqtt",
 ) -> Stream:
@@ -47,6 +49,8 @@ async def mqtt(
         Optional username to use when connecting to the MQTT server
     password
         Optional password to use when connecting to the MQTT server
+    client_id:
+        Optional client ID to use when connecting to the MQTT server
     message_is_json
         The MQTT message is encoded as JSON and should be parsed
     prefix
@@ -61,12 +65,12 @@ async def mqtt(
 
     while True:
         try:
-            async with Client(
+            async with Client(  # pragma: no cover
                 host,
                 port,
                 username=username,
                 password=password,
-                client_id=prefix,  # XXX
+                client_id=client_id or prefix,
                 clean_session=False,
             ) as client:
                 streams = [

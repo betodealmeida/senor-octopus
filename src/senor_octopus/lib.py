@@ -11,6 +11,7 @@ from typing import Union
 
 import asciidag.graph
 import asciidag.node
+
 from senor_octopus.graph import Node
 from senor_octopus.graph import Source
 from senor_octopus.types import Event

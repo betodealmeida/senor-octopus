@@ -26,6 +26,8 @@ async def udp(
 
     Parameters
     ----------
+    protocol
+        Protocol to use for decoding the datagrams
     host
         Hostname or IP address to listen to
     port
@@ -38,20 +40,20 @@ async def udp(
     Yields
     ------
     Event
-        Events with messages received
+        Events with messages processed by the protocol
     """
     queue: asyncio.Queue = asyncio.Queue()
 
     try:
         protocol_class = next(
-            iter_entry_points("senor_octopus.udp_protocols", protocol)
+            iter_entry_points("senor_octopus.source.udp.protocols", protocol)
         ).load()
     except StopIteration as ex:
         raise Exception(f'Protocol "{protocol}" not found') from ex
 
     while True:
         loop = asyncio.get_running_loop()
-        transport, _ = await loop.create_datagram_endpoint(
+        transport, _ = await loop.create_datagram_endpoint(  # pragma: no cover
             lambda: protocol_class(queue, **kwargs),
             local_addr=(host, port),
         )

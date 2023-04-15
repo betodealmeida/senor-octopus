@@ -21,9 +21,11 @@ def test_flatten() -> None:
     }
 
 
-def test_render_dag(mock_dag) -> None:
+@pytest.mark.asyncio
+async def test_render_dag(mock_config) -> None:
+    dag = build_dag(mock_config)
     assert (
-        render_dag(mock_dag, use_color=False).strip()
+        render_dag(dag, use_color=False).strip()
         == r"""
 *   random
 |\  
@@ -56,6 +58,7 @@ four:
   plugin: sink.log
   flow: two, three ->
         """,
+        Loader=yaml.SafeLoader,
     )
 
     dag = build_dag(config)

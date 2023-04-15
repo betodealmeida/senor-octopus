@@ -4,8 +4,9 @@ from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
 
-from senor_octopus.types import Stream
 from suntime import Sun
+
+from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)
 

@@ -4,6 +4,7 @@ import logging
 import sys
 
 import yaml
+
 from senor_octopus import __version__
 from senor_octopus.graph import build_dag
 from senor_octopus.lib import render_dag
@@ -73,7 +74,7 @@ async def main(args):
 
     _logger.info("Reading configuration")
     with open(args.f) as fp:
-        config = yaml.load(fp)
+        config = yaml.load(fp, Loader=yaml.SafeLoader)
     _logger.info("Building DAG")
     dag = build_dag(config)
     _logger.info("\n%s", render_dag(dag))

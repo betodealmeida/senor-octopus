@@ -70,6 +70,7 @@ three:
   plugin: sink.log
   flow: "* ->"
     """,
+        Loader=yaml.SafeLoader,
     )
     dag = build_dag(config)
     assert len(dag) == 2
@@ -84,6 +85,7 @@ def test_build_dag_missing_plugin() -> None:
 a:
   flow: -> *
     """,
+        Loader=yaml.SafeLoader,
     )
     with pytest.raises(Exception) as excinfo:
         build_dag(config)
@@ -106,6 +108,7 @@ c:
   flow: "* ->"
   plugin: sink.log
     """,
+        Loader=yaml.SafeLoader,
     )
     build_dag(config)
 
@@ -116,6 +119,7 @@ def test_build_dag_missing_flow() -> None:
 a:
   plugin: source.random
     """,
+        Loader=yaml.SafeLoader,
     )
     with pytest.raises(Exception) as excinfo:
         build_dag(config)
@@ -129,6 +133,7 @@ a:
   plugin: source.invalid
   flow: -> *
     """,
+        Loader=yaml.SafeLoader,
     )
     with pytest.raises(Exception) as excinfo:
         build_dag(config)
@@ -169,6 +174,7 @@ log:
   flow: random ->
   batch: 2 minutes
     """,
+        Loader=yaml.SafeLoader,
     )
 
     with vclock.patch_loop():
@@ -200,6 +206,7 @@ log:
   flow: random ->
   batch: 2 minutes
     """,
+        Loader=yaml.SafeLoader,
     )
 
     with vclock.patch_loop():
@@ -231,6 +238,7 @@ log:
   flow: random ->
   throttle: 2 minutes
     """,
+        Loader=yaml.SafeLoader,
     )
 
     with vclock.patch_loop():
@@ -284,6 +292,7 @@ log:
   flow: random ->
   throttle: 2 minutes
     """,
+        Loader=yaml.SafeLoader,
     )
 
     with vclock.patch_loop():
@@ -318,6 +327,7 @@ log:
   flow: random ->
   batch: 2 minutes
     """,
+        Loader=yaml.SafeLoader,
     )
 
     with vclock.patch_loop():

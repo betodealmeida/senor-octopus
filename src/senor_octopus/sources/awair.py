@@ -2,6 +2,7 @@ import logging
 
 import dateutil.parser
 import httpx
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)

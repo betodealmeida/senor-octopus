@@ -3,11 +3,12 @@ from datetime import datetime
 from datetime import timezone
 from typing import Generator
 
-from senor_octopus.types import Event
-from senor_octopus.types import Stream
 from sqlalchemy import text
 from sqlalchemy.engine import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
+
+from senor_octopus.types import Event
+from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)
 

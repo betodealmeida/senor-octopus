@@ -3,6 +3,7 @@ from datetime import datetime
 from datetime import timezone
 
 import speedtest
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)

@@ -4,6 +4,7 @@ from datetime import timezone
 from typing import List
 
 import cryptocompare
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)

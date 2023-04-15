@@ -3,6 +3,7 @@ from datetime import datetime
 from datetime import timezone
 
 import httpx
+
 from senor_octopus.lib import flatten
 from senor_octopus.types import Stream
 

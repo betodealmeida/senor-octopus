@@ -1,0 +1,1 @@
+-e file:.[testing,source.awair,source.crypto,source.mqtt,source.speedtest,source.sqla,source.stock,source.sun,source.weatherapi,source.whistle,filter.jinja,filter.jsonpath,sink.db.postgres,sink.mqtt,sink.pushover,sink.slack,sink.sms,sink.tuya]

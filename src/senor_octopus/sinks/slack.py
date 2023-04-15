@@ -1,7 +1,8 @@
 import logging
 
-from senor_octopus.types import Stream
 from slack_sdk import WebClient
+
+from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)
 

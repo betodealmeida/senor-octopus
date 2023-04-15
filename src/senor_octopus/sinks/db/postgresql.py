@@ -4,6 +4,7 @@ import textwrap
 import aiopg
 from psycopg2 import sql
 from psycopg2.extras import Json
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)

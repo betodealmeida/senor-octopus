@@ -4,6 +4,7 @@ from datetime import timezone
 
 import pytest
 from freezegun import freeze_time
+
 from senor_octopus.sources.rand import rand
 
 

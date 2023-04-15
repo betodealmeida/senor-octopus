@@ -1,6 +1,7 @@
 import logging
 
 from jsonpath import JSONPath
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)

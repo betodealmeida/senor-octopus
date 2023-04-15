@@ -5,6 +5,7 @@ from datetime import timezone
 import geohash
 from aiohttp import ClientSession
 from pywhistle import Client
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)

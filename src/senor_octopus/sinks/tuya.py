@@ -1,9 +1,10 @@
 import logging
 from functools import lru_cache
 
-from senor_octopus.types import Stream
 from tuyapy import TuyaApi
 from typing_extensions import Literal
+
+from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)
 

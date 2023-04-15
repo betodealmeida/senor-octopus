@@ -14,6 +14,7 @@ from asyncstdlib.builtins import aiter
 from crontab import CronTab
 from durations import Duration
 from pkg_resources import iter_entry_points
+
 from senor_octopus.types import Event
 from senor_octopus.types import FilterCallable
 from senor_octopus.types import LoggerCallable

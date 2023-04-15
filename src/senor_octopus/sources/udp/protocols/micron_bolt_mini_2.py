@@ -103,9 +103,12 @@ class MicronBoltMini2UDPProtocol(asyncio.DatagramProtocol):
         # GPS information
         elif parts[0] in {"+RESP:GTFRI", "+BUFF:GTFRI"}:
             value = {
-                "latitude": float(parts[12]),
-                "longitude": float(parts[11]),
                 "accuracy": float(parts[7]),
+                "speed": float(parts[8]),
+                "azimuth": float(parts[9]),
+                "altitude": float(parts[10]),
+                "longitude": float(parts[11]),
+                "latitude": float(parts[12]),
                 "battery": float(parts[-3]),
                 "source": "gps",
             }

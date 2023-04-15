@@ -108,7 +108,6 @@ Version 0.1.1 - 2021-03-23
 - Add missing dependency
 - New source: Speedtest
 
-- Initial release
 Version 0.1 - 2021-03-23
 ========================
 

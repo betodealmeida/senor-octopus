@@ -61,10 +61,10 @@ async def test_micron_bolt_mini_2_gps(mocker: MockerFixture):
     protocol.connection_made(transport)
     protocol.datagram_received(
         (
-            "+RESP:GTFRI,423136,352009117419957,,0,0,1,1.0,0.0,62,"
-            "28.3,-122.990623,38.313342,20230414193420,310,260,38F2,"
-            "2D01A05,00,77,20230414193424,0297$"
-        ).encode(),
+            b"+RESP:GTFRI,423136,352009117419957,,0,0,1,1.0,0.0,62,"
+            b"28.3,-122.990623,38.313342,20230414193420,310,260,38F2,"
+            b"2D01A05,00,77,20230414193424,0297$"
+        ),
         addr,
     )
     value = await queue.get()
@@ -90,10 +90,10 @@ async def test_micron_bolt_mini_2_wifi_no_api_key(mocker: MockerFixture):
     protocol.connection_made(transport)
     protocol.datagram_received(
         (
-            "+RESP:GTWIF,423136,352009117419957,,4,b0e4d556fbc6,-58"
-            ",,,,a4d79504102d,-73,,,,322f23291e0b,-78,,,,"
-            "44a56edcdae8,-88,,,,,,,,77,20230414193408,0295$"
-        ).encode(),
+            b"+RESP:GTWIF,423136,352009117419957,,4,b0e4d556fbc6,-58"
+            b",,,,a4d79504102d,-73,,,,322f23291e0b,-78,,,,"
+            b"44a56edcdae8,-88,,,,,,,,77,20230414193408,0295$"
+        ),
         addr,
     )
     assert queue.empty()
@@ -120,10 +120,10 @@ async def test_micron_bolt_mini_2_wifi(
     protocol.connection_made(transport)
     protocol.datagram_received(
         (
-            "+RESP:GTWIF,423136,352009117419957,,4,b0e4d556fbc6,-58"
-            ",,,,a4d79504102d,-73,,,,322f23291e0b,-78,,,,"
-            "44a56edcdae8,-88,,,,,,,,77,20230414193408,0295$"
-        ).encode(),
+            b"+RESP:GTWIF,423136,352009117419957,,4,b0e4d556fbc6,-58"
+            b",,,,a4d79504102d,-73,,,,322f23291e0b,-78,,,,"
+            b"44a56edcdae8,-88,,,,,,,,77,20230414193408,0295$"
+        ),
         addr,
     )
     value = await queue.get()
@@ -170,10 +170,10 @@ async def test_micron_bolt_mini_2_wifi_not_found(
     protocol.connection_made(transport)
     protocol.datagram_received(
         (
-            "+RESP:GTWIF,423136,352009117419957,,4,b0e4d556fbc6,-58"
-            ",,,,a4d79504102d,-73,,,,322f23291e0b,-78,,,,"
-            "44a56edcdae8,-88,,,,,,,,77,20230414193408,0295$"
-        ).encode(),
+            b"+RESP:GTWIF,423136,352009117419957,,4,b0e4d556fbc6,-58"
+            b",,,,a4d79504102d,-73,,,,322f23291e0b,-78,,,,"
+            b"44a56edcdae8,-88,,,,,,,,77,20230414193408,0295$"
+        ),
         addr,
     )
     assert queue.empty()

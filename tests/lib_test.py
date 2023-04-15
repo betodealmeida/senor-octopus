@@ -33,13 +33,7 @@ async def test_render_dag(mock_config) -> None:
     dag = build_dag(mock_config)
     assert (
         render_dag(dag, use_color=False).strip()
-        == r"""
-*   random
-|\
-* | check
-| * normal
-* high
-        """.strip()
+        == "*   random\n|\\  \n* | check\n| * normal\n* high"
     )
 
 
@@ -74,14 +68,7 @@ four:
     dag = build_dag(config)
     assert (
         render_dag(dag, use_color=False).strip()
-        == r"""
-*   one
-|\
-* | three
-| * two
-|/
-* four
-        """.strip()
+        == "*   one\n|\\  \n* | three\n| * two\n|/  \n* four"
     )
 
 

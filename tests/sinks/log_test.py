@@ -2,7 +2,6 @@
 Tests for ``sink.log``.
 """
 
-import logging
 import random
 from datetime import datetime, timezone
 
@@ -19,7 +18,8 @@ async def test_log(mocker) -> None:
     """
     Tests for the sink.
     """
-    _logger = mocker.patch("senor_octopus.sinks.log._logger")
+    logging = mocker.patch("senor_octopus.sinks.log.logging")
+    _logger = logging.getLogger()
     random.seed(42)
 
     await log(rand(1), level="INFO")

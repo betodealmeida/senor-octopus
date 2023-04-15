@@ -7,7 +7,7 @@ import logging
 from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 
 from asyncstdlib import itertools
-from asyncstdlib.builtins import aiter_
+from asyncstdlib.builtins import aiter as aiter_
 from crontab import CronTab
 from durations import Duration
 from pkg_resources import iter_entry_points

@@ -169,18 +169,19 @@ async def test_run_source(mocker, mock_config) -> None:
     """
     Test running sources.
     """
-    mock_logger = mocker.patch("senor_octopus.sinks.log._logger")
+    logging = mocker.patch("senor_octopus.sinks.log.logging")
+    _logger = logging.getLogger()
     random.seed(42)
 
     dag = build_dag(mock_config)
     source = dag.pop()
 
     await source.run()
-    assert len(mock_logger.log.mock_calls) == 14
+    assert len(_logger.log.mock_calls) == 14
 
     # test throttle, should get 10 entries from the non-throttled sink
     await source.run()
-    assert len(mock_logger.log.mock_calls) == 24
+    assert len(_logger.log.mock_calls) == 24
 
 
 @pytest.mark.asyncio
@@ -188,7 +189,8 @@ async def test_batch(mocker) -> None:
     """
     Test batch mode.
     """
-    mock_logger = mocker.patch("senor_octopus.sinks.log._logger")
+    logging = mocker.patch("senor_octopus.sinks.log.logging")
+    _logger = logging.getLogger()
     vclock = aiotools.VirtualClock()
 
     config = yaml.load(
@@ -211,10 +213,10 @@ log:
         source = dag.pop()
 
         await source.run()
-        assert len(mock_logger.log.mock_calls) == 0
+        assert len(_logger.log.mock_calls) == 0
 
         await asyncio.sleep(180)
-        assert len(mock_logger.log.mock_calls) == 10
+        assert len(_logger.log.mock_calls) == 10
 
 
 @pytest.mark.asyncio
@@ -222,7 +224,8 @@ async def test_batch_empty_source(mocker) -> None:
     """
     Test batch mode when no plugins are configured in batch mode.
     """
-    mock_logger = mocker.patch("senor_octopus.sinks.log._logger")
+    logging = mocker.patch("senor_octopus.sinks.log.logging")
+    _logger = logging.getLogger()
     vclock = aiotools.VirtualClock()
 
     config = yaml.load(
@@ -246,10 +249,10 @@ log:
         source = dag.pop()
 
         await source.run()
-        assert len(mock_logger.log.mock_calls) == 0
+        assert len(_logger.log.mock_calls) == 0
 
         await asyncio.sleep(180)
-        assert len(mock_logger.log.mock_calls) == 0
+        assert len(_logger.log.mock_calls) == 0
 
 
 @pytest.mark.asyncio
@@ -257,7 +260,8 @@ async def test_throttle(mocker) -> None:
     """
     Test throttle mode.
     """
-    _logger = mocker.patch("senor_octopus.sinks.log._logger")
+    logging = mocker.patch("senor_octopus.sinks.log.logging")
+    _logger = logging.getLogger()
     vclock = aiotools.VirtualClock()
 
     config = yaml.load(
@@ -314,7 +318,8 @@ async def test_throttle_without_events(mocker) -> None:
     """
     Test throttle mode when no events happen.
     """
-    _logger = mocker.patch("senor_octopus.sinks.log._logger")
+    logging = mocker.patch("senor_octopus.sinks.log.logging")
+    _logger = logging.getLogger()
     vclock = aiotools.VirtualClock()
 
     config = yaml.load(
@@ -351,8 +356,8 @@ async def test_batch_cancel(mocker) -> None:
     """
     Test that batch events are processed when the scheduler is canceled.
     """
-    mock_logger = mocker.MagicMock()
-    mocker.patch("senor_octopus.sinks.log._logger", mock_logger)
+    logging = mocker.patch("senor_octopus.sinks.log.logging")
+    _logger = logging.getLogger()
     vclock = aiotools.VirtualClock()
 
     config = yaml.load(
@@ -383,7 +388,7 @@ log:
         )
 
         await source.run()
-        assert len(mock_logger.log.mock_calls) == 0
+        assert len(_logger.log.mock_calls) == 0
 
         await asyncio.sleep(1800)
-        assert len(mock_logger.log.mock_calls) == 3
+        assert len(_logger.log.mock_calls) == 3

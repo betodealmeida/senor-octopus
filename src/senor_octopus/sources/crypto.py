@@ -1,9 +1,13 @@
+"""
+Fetch price of cryptocurrencies from cryptocompare.com.
+"""
+
 import logging
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 from typing import List
 
 import cryptocompare
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)

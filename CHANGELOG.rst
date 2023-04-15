@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Next
+====
+
+- Modernize the code base, testing with Python 3.10 and 3.11
+- Add UDP server with support for custom protocols
+- Add protocol for the Micron Bolt Mini 2 GPS tracker
+
 Version 0.1.16 - 2021-06-23
 ===========================
 
@@ -48,7 +55,7 @@ Version 0.1.11 - 2021-05-05
 Version 0.1.10 - 2021-03-29
 ===========================
 
-- Modified scheduler to run tasks concurrently 
+- Modified scheduler to run tasks concurrently
 - Modified scheduler to gracefully cancel tasks
 - Added support for event-driven sources (non-scheduled)
 - New sources: Whistle, stocks, crypto, mqtt
@@ -103,7 +110,6 @@ Version 0.1.1 - 2021-03-23
 - Add missing dependency
 - New source: Speedtest
 
-- Initial release
 Version 0.1 - 2021-03-23
 ========================
 

@@ -1,22 +1,30 @@
+"""
+A sink to control Tuya/Smart Life devices.
+"""
+
 import logging
 from functools import lru_cache
 
-from senor_octopus.types import Stream
 from tuyapy import TuyaApi
 from typing_extensions import Literal
+
+from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)
 
 
 @lru_cache(maxsize=None)
 def authenticate(email: str, password: str, country: str, application: str) -> TuyaApi:
+    """
+    Cached authentication to Tuya/Smart Life.
+    """
     _logger.debug("Authenticating")
     api = TuyaApi()
     api.init(email, password, country, application)
     return api
 
 
-async def tuya(
+async def tuya(  # pylint: disable=too-many-arguments
     stream: Stream,
     device: str,
     email: str,

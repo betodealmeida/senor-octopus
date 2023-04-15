@@ -1,11 +1,17 @@
+"""
+A simple sink that logs events to a logger.
+"""
+
 import logging
 
 from senor_octopus.types import Stream
 
-_logger = logging.getLogger(__name__)
 
-
-async def log(stream: Stream, level: str = "INFO") -> None:
+async def log(
+    stream: Stream,
+    level: str = "INFO",
+    name: str = __name__,
+) -> None:
     """
     Send events to a logger.
 
@@ -19,5 +25,6 @@ async def log(stream: Stream, level: str = "INFO") -> None:
     level
         The logging level to be used
     """
-    async for event in stream:
+    _logger = logging.getLogger(name)
+    async for event in stream:  # pragma: no cover
         _logger.log(getattr(logging, level.upper()), event)

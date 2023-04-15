@@ -1,6 +1,11 @@
+"""
+A sink for sending events to the Pushover mobile app.
+"""
+
 import logging
 
 import httpx
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)
@@ -28,7 +33,7 @@ async def pushover(stream: Stream, app_token: str, user_token: str) -> None:
         data = {
             "token": app_token,
             "user": user_token,
-            "message": "{name}: {value}".format(**event),
+            "message": "{event['name']}: {event['value']}",
         }
         _logger.info("Posting message to Pushover")
         async with httpx.AsyncClient() as client:

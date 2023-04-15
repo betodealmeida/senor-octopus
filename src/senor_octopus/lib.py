@@ -1,20 +1,20 @@
+"""
+Helper functions for Señor Octopus.
+"""
+
+from __future__ import annotations
+
 import asyncio
 from asyncio.futures import Future
 from io import StringIO
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Set
-from typing import Tuple
-from typing import Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 import asciidag.graph
 import asciidag.node
-from senor_octopus.graph import Node
-from senor_octopus.graph import Source
-from senor_octopus.types import Event
-from senor_octopus.types import Stream
+from asyncstdlib.builtins import anext as anext_
+
+from senor_octopus.graph import Node, Source
+from senor_octopus.types import Event, Stream
 
 
 def flatten(
@@ -22,6 +22,12 @@ def flatten(
     prefix: str = "",
     sep: str = ".",
 ) -> Dict[str, Union[str, int, float]]:
+    """
+    Flatten a nested dictionary.
+
+    This will flatten a dictionary with nested dictionaries, combining the keys
+    with a period.
+    """
     items: List[Tuple[str, Union[str, int, float]]] = []
     for key, value in obj.items():
         new_key = sep.join((prefix, key)) if prefix else key
@@ -33,6 +39,9 @@ def flatten(
 
 
 def render_dag(dag: Set[Source], **kwargs: Any) -> str:
+    """
+    Render a DAG as an ASCII graph.
+    """
     out = StringIO()
     graph = asciidag.graph.Graph(out, **kwargs)
     asciidag_nodes: Dict[str, asciidag.node.Node] = {}
@@ -50,6 +59,9 @@ def build_asciidag(
     node: Node,
     asciidag_nodes: Dict[str, asciidag.node.Node],
 ) -> asciidag.node.Node:
+    """
+    Build an asciidag node from a Node.
+    """
     if node.name in asciidag_nodes:
         asciidag_node = asciidag_nodes[node.name]
     else:
@@ -65,6 +77,9 @@ def build_asciidag(
 
 
 async def merge_streams(*streams: Stream) -> Stream:
+    """
+    Merge multiple streams into a single stream.
+    """
     streams_next: Dict[
         Stream,
         Optional[Future[Event]],
@@ -73,11 +88,11 @@ async def merge_streams(*streams: Stream) -> Stream:
     while streams_next:
         for stream, next_ in streams_next.items():
             if next_ is None:
-                future = asyncio.ensure_future(stream.__anext__())
+                future = asyncio.ensure_future(anext_(stream))
                 stream_map[future] = stream
                 streams_next[stream] = future
 
-        done, pending = await asyncio.wait(
+        done, pending = await asyncio.wait(  # pylint: disable=unused-variable
             {stream for stream in streams_next.values() if stream},
             return_when=asyncio.FIRST_COMPLETED,
         )

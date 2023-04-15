@@ -36,7 +36,7 @@ crypto:
 
 # The MQTT source subcribes to a topic (or topic wildcard ) and
 # emits events every time a message is received.
-# 
+#
 # Since it's event based, it should have no schedule.
 mqtt_source:
   plugin: source.mqtt
@@ -226,7 +226,7 @@ postgres:
   plugin: sink.db.postgresql
   flow: "* ->"
   # Batch will store all events in a queue until for a given time,
-  # and then process all of them at once. Queued events are 
+  # and then process all of them at once. Queued events are
   # processed if the application is termined gracefully. This
   # option can be used with any sink.
   batch: 5 minutes

@@ -1,8 +1,12 @@
+"""
+A source that fetches data from WeatherAPI.
+"""
+
 import logging
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 import httpx
+
 from senor_octopus.lib import flatten
 from senor_octopus.types import Stream
 

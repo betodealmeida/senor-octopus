@@ -1,11 +1,14 @@
+"""
+A source that emits sunrise/sunset events.
+"""
+
 import asyncio
 import logging
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
+from datetime import datetime, timedelta, timezone
+
+from suntime import Sun
 
 from senor_octopus.types import Stream
-from suntime import Sun
 
 _logger = logging.getLogger(__name__)
 

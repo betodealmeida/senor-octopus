@@ -1,13 +1,16 @@
+"""
+A generic source for reading data from a database via SQLAlchemy.
+"""
+
 import logging
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 from typing import Generator
 
-from senor_octopus.types import Event
-from senor_octopus.types import Stream
 from sqlalchemy import text
 from sqlalchemy.engine import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine
+
+from senor_octopus.types import Event, Stream
 
 _logger = logging.getLogger(__name__)
 
@@ -53,6 +56,9 @@ async def sqla(
 
 
 def read_sync(uri: str, sql: str, prefix: str) -> Generator[Event, None, None]:
+    """
+    Read data from database synchronously.
+    """
     engine = create_engine(uri)
 
     with engine.connect() as conn:
@@ -67,6 +73,9 @@ def read_sync(uri: str, sql: str, prefix: str) -> Generator[Event, None, None]:
 
 
 async def read_async(uri: str, sql: str, prefix: str) -> Stream:
+    """
+    Read data from database asynchronously.
+    """
     engine = create_async_engine(uri)
 
     async with engine.connect() as conn:

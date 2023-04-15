@@ -1,10 +1,14 @@
+"""
+A source for Whistle pet trackers.
+"""
+
 import logging
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 import geohash
 from aiohttp import ClientSession
 from pywhistle import Client
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)

@@ -1,34 +1,42 @@
+"""
+Functions for building a DAG.
+"""
+
 import asyncio
 import logging
-from typing import Any
-from typing import cast
-from typing import Dict
-from typing import List
-from typing import Optional
-from typing import Set
-from typing import Tuple
-from typing import Union
+from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 
 from asyncstdlib import itertools
-from asyncstdlib.builtins import aiter
+from asyncstdlib.builtins import aiter as aiter_
 from crontab import CronTab
 from durations import Duration
 from pkg_resources import iter_entry_points
-from senor_octopus.types import Event
-from senor_octopus.types import FilterCallable
-from senor_octopus.types import LoggerCallable
-from senor_octopus.types import SinkCallable
-from senor_octopus.types import SourceCallable
-from senor_octopus.types import Stream
+
+from senor_octopus.exceptions import InvalidConfigurationException
+from senor_octopus.types import (
+    Event,
+    FilterCallable,
+    LoggerCallable,
+    SinkCallable,
+    SourceCallable,
+    Stream,
+)
 
 
 async def log_events(stream: Stream, flow: str, log: LoggerCallable) -> Stream:
+    """
+    Log all events going through a stream.
+    """
     async for event in stream:
         log("%s: %s", flow, event)
         yield event
 
 
-class Node:
+class Node:  # pylint: disable=too-few-public-methods
+    """
+    A node.
+    """
+
     def __init__(self, node_name: str):
         self.name = node_name
 
@@ -41,17 +49,24 @@ class Node:
         node_name: str,
         section: Dict[str, Any],
     ) -> Union["Source", "Filter", "Sink"]:
+        """
+        Build a node from the configuration YAML.
+        """
         # load plugin
         try:
             plugin_name = section.pop("plugin")
-        except KeyError:
-            raise Exception("Invalid config, missing `plugin` key")
+        except KeyError as ex:
+            raise InvalidConfigurationException(
+                "Invalid config, missing `plugin` key",
+            ) from ex
         try:
             plugin = next(
                 iter_entry_points("senor_octopus.plugins", plugin_name),
             ).load()
-        except StopIteration:
-            raise Exception(f"Invalid plugin name `{plugin_name}`")
+        except StopIteration as ex:
+            raise InvalidConfigurationException(
+                f"Invalid plugin name `{plugin_name}`",
+            ) from ex
 
         kwargs = section.copy()
         flow = kwargs.pop("flow").strip()
@@ -63,6 +78,13 @@ class Node:
 
 
 class Source(Node):
+    """
+    A source node.
+
+    A source node has no parents, and can optionally have a schedule for it to
+    run periodically, cascading the events down the graph.
+    """
+
     def __init__(
         self,
         node_name: str,
@@ -76,38 +98,64 @@ class Source(Node):
         self.extra_kwargs = extra_kwargs
 
     async def run(self) -> None:
+        """
+        Run the source node.
+
+        This will call the source node plugin to fetch events, and pass them
+        down to children.
+        """
         self._logger.info("Running")
-        stream = self.plugin(**self.extra_kwargs)
-        async with itertools.tee(stream, n=len(self.next)) as streams:
-            for node, stream in zip(self.next, streams):
-                stream = log_events(
-                    stream,
+        downstream = self.plugin(**self.extra_kwargs)
+        async with itertools.tee(downstream, n=len(self.next)) as streams:
+            for node, stream_copy in zip(self.next, streams):
+                logged_stream = log_events(
+                    stream_copy,
                     f"{self.name} -> {node.name}",
                     self._event_logger.debug,
                 )
-                await node.run(stream)
+                await node.run(logged_stream)
 
 
 class Filter(Node):
+    """
+    A filter node.
+
+    Filters will receive events from their parents, and can return them down
+    to their children, modified or filtered.
+    """
+
     def __init__(self, node_name: str, plugin: FilterCallable, **extra_kwargs: Any):
         super().__init__(node_name)
         self.plugin = plugin
         self.extra_kwargs = extra_kwargs
 
     async def run(self, stream: Stream) -> None:
+        """
+        Run the filter node.
+
+        This will receive a stream from the parent(s), process events,
+        potentially modifying and/or filtering them.
+        """
         self._logger.info("Running")
-        stream = self.plugin(stream, **self.extra_kwargs)
-        async with itertools.tee(stream, n=len(self.next)) as streams:
-            for node, stream in zip(self.next, streams):
-                stream = log_events(
-                    stream,
+        downstream = self.plugin(stream, **self.extra_kwargs)
+        async with itertools.tee(downstream, n=len(self.next)) as streams:
+            for node, stream_copy in zip(self.next, streams):
+                logged_stream = log_events(
+                    stream_copy,
                     f"{self.name} -> {node.name}",
                     self._event_logger.debug,
                 )
-                await node.run(stream)
+                await node.run(logged_stream)
 
 
 class Sink(Node):
+    """
+    A sink node.
+
+    Sink nodes receive events and consume them, storing in databases, sending
+    them over SMS, etc.
+    """
+
     def __init__(
         self,
         node_name: str,
@@ -127,6 +175,17 @@ class Sink(Node):
         self.task = asyncio.create_task(self.worker())
 
     async def run(self, stream: Stream) -> None:
+        """
+        Run the sink node.
+
+        This will receive a stream from the parent(s), process events.
+
+        When running in batch mode the events will be stored in a queue
+        instead, so that events are processed in batch periodically.
+
+        The source node can also be throttled, so that it doesn't run too
+        often, dropping events if necessary.
+        """
         loop = asyncio.get_running_loop()
 
         if (
@@ -153,6 +212,9 @@ class Sink(Node):
             await self.plugin(stream, **self.extra_kwargs)  # type: ignore
 
     async def run_and_update_last_run(self, stream: Stream) -> Stream:
+        """
+        Run the sink node and store the time so events can be throttled.
+        """
         loop = asyncio.get_running_loop()
 
         at_least_one = False
@@ -164,6 +226,9 @@ class Sink(Node):
             self.last_run = loop.time()
 
     async def worker(self) -> None:
+        """
+        An async worker that processes events in batch.
+        """
         if self.batch is None:
             return
 
@@ -191,7 +256,7 @@ class Sink(Node):
                 except RuntimeError:
                     return
                 except asyncio.CancelledError:
-                    self._logger.info("Cancelled, dumping currently batched events")
+                    self._logger.info("Canceled, dumping currently batched events")
                     canceled = True
                     break
 
@@ -204,10 +269,13 @@ class Sink(Node):
                 self.queue.task_done()
 
             self._logger.info("Processing batch")
-            await self.plugin(aiter(stream), **self.extra_kwargs)  # type: ignore
+            await self.plugin(aiter_(stream), **self.extra_kwargs)  # type: ignore
 
 
 def connected(config, source, target) -> bool:
+    """
+    Check if two nodes are connected in the DAG.
+    """
     targets = config[source]["flow"].split("->")[1].strip()
     if targets != "*" and target not in {
         target.strip() for target in targets.split(",")
@@ -224,10 +292,13 @@ def connected(config, source, target) -> bool:
 
 
 def build_dag(config: Dict[str, Any]) -> Set[Source]:
+    """
+    Build the DAG from the YAML configuration.
+    """
     sections = set(config)
     for section in sections:
         if "flow" not in config[section]:
-            raise Exception("Invalid config, missing `flow` key")
+            raise InvalidConfigurationException("Invalid config, missing `flow` key")
 
     sources = {
         name for name in sections if config[name]["flow"].strip().startswith("->")

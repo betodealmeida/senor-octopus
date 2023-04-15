@@ -1,3 +1,7 @@
+"""
+A simple filter based on Python string formatting.
+"""
+
 import ast
 import logging
 from typing import Optional
@@ -7,7 +11,7 @@ from senor_octopus.types import Stream
 _logger = logging.getLogger(__name__)
 
 
-async def format(
+async def format(  # pylint: disable=redefined-builtin
     stream: Stream,
     name: Optional[str] = None,
     value: Optional[str] = None,
@@ -28,7 +32,7 @@ async def format(
     value
         A string formatted with the original event that replaces the value
     eval_value
-        Wether the new value should be evaluated
+        Whether the new value should be evaluated
 
     Yields
     ------

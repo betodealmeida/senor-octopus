@@ -1,13 +1,18 @@
+"""
+A sink that sends events to an MQTT topic.
+"""
+
 import logging
 from typing import Optional
 
 from asyncio_mqtt import Client
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)
 
 
-async def mqtt(
+async def mqtt(  # pylint: disable=too-many-arguments
     stream: Stream,
     topic: str,
     host: str = "localhost",

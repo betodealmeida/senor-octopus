@@ -1,6 +1,11 @@
+"""
+A filter that applies a Jinja2 template to events.
+"""
+
 import logging
 
 from jinja2 import Template
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)

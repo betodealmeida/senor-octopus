@@ -54,3 +54,4 @@ MANIFEST
 
 config.yaml
 venv
+.python-version

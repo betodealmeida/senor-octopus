@@ -1,15 +1,20 @@
+"""
+A Postgres sink.
+"""
+
 import logging
 import textwrap
 
 import aiopg
 from psycopg2 import sql
 from psycopg2.extras import Json
+
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)
 
 
-async def postgresql(
+async def postgresql(  # pylint: disable=too-many-arguments
     stream: Stream,
     user: str,
     password: str,

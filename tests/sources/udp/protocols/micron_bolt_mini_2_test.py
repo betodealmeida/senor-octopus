@@ -69,11 +69,14 @@ async def test_micron_bolt_mini_2_gps(mocker: MockerFixture):
     )
     value = await queue.get()
     assert value == {
+        "accuracy": 1.0,
+        "altitude": 28.3,
+        "azimuth": 62.0,
+        "battery": 77.0,
         "latitude": 38.313342,
         "longitude": -122.990623,
-        "accuracy": 1.0,
-        "battery": 77.0,
         "source": "gps",
+        "speed": 0.0,
     }
 
 

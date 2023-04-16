@@ -47,4 +47,10 @@ async def mqtt(  # pylint: disable=too-many-arguments
     """
     async with Client(host, port, username=username, password=password) as client:
         async for event in stream:  # pragma: no cover
-            await client.publish(topic, event["value"], qos=qos)
+            value = event["value"]
+            if (
+                not isinstance(value, (str, bytearray, int, float))
+                and value is not None
+            ):
+                value = str(value)
+            await client.publish(topic, value, qos=qos)

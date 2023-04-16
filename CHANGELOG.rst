@@ -9,6 +9,7 @@ Next
 - Add UDP server with support for custom protocols
 - Add protocol for the Micron Bolt Mini 2 GPS tracker
 - New filter: YAML/JSON parser
+- Fix MQTT filter ensuring value has the correct type
 
 Version 0.1.16 - 2021-06-23
 ===========================

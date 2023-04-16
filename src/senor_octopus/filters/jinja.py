@@ -33,6 +33,13 @@ async def jinja(stream: Stream, template: str) -> Stream:
     """
     _logger.debug("Applying template to events")
     tmpl = Template(template)
+    tmpl.globals.update(
+        {
+            "int": int,
+            "float": float,
+            "str": str,
+        },
+    )
     async for event in stream:  # pragma: no cover
         value = tmpl.render(event=event).strip()
         if value:

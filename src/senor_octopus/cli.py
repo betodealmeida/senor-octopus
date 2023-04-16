@@ -64,7 +64,7 @@ def parse_args(args):
         "--dry-run",
         dest="dryrun",
         help="Dry run, print the DAG and exit",
-        action=argparse.BooleanOptionalAction,
+        action="store_true",
     )
     return parser.parse_args(args)
 

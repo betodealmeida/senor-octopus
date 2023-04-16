@@ -5,11 +5,19 @@ An UDP protocol for the Micron Bolt Mini 2 GPS tracker.
 import asyncio
 import logging
 import re
+from datetime import datetime, timezone
 from typing import List, Optional, Tuple, TypedDict, cast
 
 import requests
 
 _logger = logging.getLogger(__name__)
+
+
+def parse_timestamp(timestamp: str) -> datetime:
+    """
+    Parse the GPS timestamp into a datetime object.
+    """
+    return datetime.strptime(timestamp, "%Y%m%d%H%M%S").replace(tzinfo=timezone.utc)
 
 
 class WifiAccessPointType(TypedDict):
@@ -96,6 +104,7 @@ class MicronBoltMini2UDPProtocol(asyncio.DatagramProtocol):
                     "longitude": result["location"]["lng"],
                     "accuracy": result["accuracy"],
                     "battery": float(parts[-3]),
+                    "send_time": parse_timestamp(parts[-2]),
                     "source": "wifi",
                 }
                 self.queue.put_nowait(value)
@@ -109,7 +118,9 @@ class MicronBoltMini2UDPProtocol(asyncio.DatagramProtocol):
                 "altitude": float(parts[10]),
                 "longitude": float(parts[11]),
                 "latitude": float(parts[12]),
+                "fix_time": parse_timestamp(parts[13]),
                 "battery": float(parts[-3]),
+                "send_time": parse_timestamp(parts[-2]),
                 "source": "gps",
             }
             self.queue.put_nowait(value)

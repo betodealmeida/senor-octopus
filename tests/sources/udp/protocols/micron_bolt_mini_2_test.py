@@ -3,6 +3,7 @@ Tests for the Micron Bolt Mini 2 UDP GPS tracker protocol.
 """
 
 import asyncio
+from datetime import datetime, timezone
 
 import pytest
 from pytest_mock import MockerFixture
@@ -73,8 +74,10 @@ async def test_micron_bolt_mini_2_gps(mocker: MockerFixture):
         "altitude": 28.3,
         "azimuth": 62.0,
         "battery": 77.0,
+        "fix_time": datetime(2023, 4, 14, 19, 34, 20, tzinfo=timezone.utc),
         "latitude": 38.313342,
         "longitude": -122.990623,
+        "send_time": datetime(2023, 4, 14, 19, 34, 24, tzinfo=timezone.utc),
         "source": "gps",
         "speed": 0.0,
     }
@@ -131,11 +134,12 @@ async def test_micron_bolt_mini_2_wifi(
     )
     value = await queue.get()
     assert value == {
-        "latitude": 38.3130657,
-        "longitude": -122.9903798,
         "accuracy": 20,
         "battery": 77.0,
+        "latitude": 38.3130657,
+        "longitude": -122.9903798,
         "source": "wifi",
+        "send_time": datetime(2023, 4, 14, 19, 34, 8, tzinfo=timezone.utc),
     }
 
 

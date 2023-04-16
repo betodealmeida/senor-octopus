@@ -1,5 +1,5 @@
 """
-A filter that parses the event value into different formats.
+A filter that serializes the event value into different formats.
 """
 
 import json
@@ -14,7 +14,7 @@ _logger = logging.getLogger(__name__)
 
 
 # pylint: disable=redefined-builtin
-async def parse(stream: Stream, format: str) -> Stream:
+async def serialize(stream: Stream, format: str) -> Stream:
     """
     Parse an event value.
 
@@ -26,14 +26,14 @@ async def parse(stream: Stream, format: str) -> Stream:
     Yields
     ------
     Event
-        Events parsed by the filter
+        Events serialized by the filter
     """
     _logger.debug("Applying template to events")
     async for event in stream:  # pragma: no cover
         if format.lower() == "json":
-            value = json.loads(event["value"])
+            value = json.dumps(event["value"])
         elif format.lower() == "yaml":
-            value = yaml.safe_load(event["value"])
+            value = yaml.dump(event["value"])
         else:
             raise InvalidConfigurationException(f'Invalid format "{format}"')
 

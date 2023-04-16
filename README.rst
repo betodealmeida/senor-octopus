@@ -334,6 +334,8 @@ The existing filters are very similar, the main difference being how you configu
 - `filter.format <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/format.py>`_: Format an event stream based using Python string formatting.
 - `filter.jinja <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/jinja.py>`_: Apply a Jinja2 template to events.
 - `filter.jsonpath <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/jpath.py>`_: Filter event stream based on a JSON path.
+- `filter.serialize <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/serialize.py>`_: Serialize payload to JSON or YAML.
+- `filter.deserialize <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/deserialize.py>`_: Deserialize payload from JSON or YAML.
 
 Sinks
 ~~~~~

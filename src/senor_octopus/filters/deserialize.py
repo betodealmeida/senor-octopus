@@ -1,5 +1,5 @@
 """
-A filter that parses the event value into different formats.
+A filter that deserializes the event value into different formats.
 """
 
 import json
@@ -14,7 +14,7 @@ _logger = logging.getLogger(__name__)
 
 
 # pylint: disable=redefined-builtin
-async def parse(stream: Stream, format: str) -> Stream:
+async def deserialize(stream: Stream, format: str) -> Stream:
     """
     Parse an event value.
 
@@ -26,7 +26,7 @@ async def parse(stream: Stream, format: str) -> Stream:
     Yields
     ------
     Event
-        Events parsed by the filter
+        Events deserialized by the filter
     """
     _logger.debug("Applying template to events")
     async for event in stream:  # pragma: no cover

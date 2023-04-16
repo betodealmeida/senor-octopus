@@ -10,6 +10,7 @@ Next
 - Add protocol for the Micron Bolt Mini 2 GPS tracker
 - New filters: YAML/JSON serializer and deserializer
 - Fix MQTT filter ensuring value has the correct type
+- New ``--dry-run`` flag (``-n``) that only prints the DAG
 
 Version 0.1.16 - 2021-06-23
 ===========================

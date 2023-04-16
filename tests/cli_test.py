@@ -65,6 +65,24 @@ async def test_main(mocker) -> None:
 
 
 @pytest.mark.asyncio
+async def test_main_dryrun(mocker) -> None:
+    """
+    Test a dry run.
+    """
+    mocker.patch("senor_octopus.cli.yaml")
+    mocker.patch("senor_octopus.cli.build_dag")
+    mocker.patch("senor_octopus.cli.open")
+
+    mock_scheduler = mock.MagicMock()
+    mock_scheduler.return_value.run = mocker.AsyncMock()
+    mocker.patch("senor_octopus.cli.Scheduler", mock_scheduler)
+
+    await main(["config.yaml", "--dry-run"])
+
+    mock_scheduler.return_value.run.assert_not_called()
+
+
+@pytest.mark.asyncio
 async def test_main_canceled(mocker) -> None:
     """
     Test canceling the `main` function.

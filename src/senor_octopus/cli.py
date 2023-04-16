@@ -59,6 +59,13 @@ def parse_args(args):
         action="store_const",
         const=logging.DEBUG,
     )
+    parser.add_argument(
+        "-n",
+        "--dry-run",
+        dest="dryrun",
+        help="Dry run, print the DAG and exit",
+        action="store_true",
+    )
     return parser.parse_args(args)
 
 
@@ -87,15 +94,16 @@ async def main(args):
         config = yaml.load(inp, Loader=yaml.SafeLoader)
     _logger.info("Building DAG")
     dag = build_dag(config)
-    _logger.info("\n%s", render_dag(dag))
+    sys.stdout.write(render_dag(dag))
 
-    _logger.info("Running Sr. Octopus")
-    scheduler = Scheduler(dag)
-    try:
-        await scheduler.run()
-    except asyncio.CancelledError:
-        _logger.info("Canceled")
-        scheduler.cancel()
+    if not args.dryrun:
+        _logger.info("Running Sr. Octopus")
+        scheduler = Scheduler(dag)
+        try:
+            await scheduler.run()
+        except asyncio.CancelledError:
+            _logger.info("Canceled")
+            scheduler.cancel()
 
     _logger.info("Done")
 

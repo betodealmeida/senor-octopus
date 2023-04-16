@@ -5,6 +5,8 @@ Changelog
 Next
 ====
 
+- Fix the Pushover sink
+
 Version 0.2.0 - 2023-04-16
 ==========================
 

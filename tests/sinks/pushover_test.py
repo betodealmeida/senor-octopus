@@ -21,9 +21,9 @@ async def test_pushover(httpx_mock) -> None:
     await pushover(rand(2), "XXX", "alice")
     requests = httpx_mock.get_requests()
     assert len(requests) == 2
-    assert requests[0].read() == (
-        b"token=XXX&user=alice&message=%7Bevent%5B%27name%27%5D%7D%3A+"
-        b"%7Bevent%5B%27value%27%5D%7D"
+    assert (
+        requests[0].read()
+        == b"token=XXX&user=alice&message=hub.random%3A+0.6394267984578837"
     )
 
 

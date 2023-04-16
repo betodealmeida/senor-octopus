@@ -33,7 +33,7 @@ async def pushover(stream: Stream, app_token: str, user_token: str) -> None:
         data = {
             "token": app_token,
             "user": user_token,
-            "message": "{event['name']}: {event['value']}",
+            "message": f"{event['name']}: {event['value']}",
         }
         _logger.info("Posting message to Pushover")
         async with httpx.AsyncClient() as client:

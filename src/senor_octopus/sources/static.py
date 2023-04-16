@@ -3,11 +3,12 @@ Simple source node that generates static events.
 """
 
 from datetime import datetime, timezone
+from typing import Any
 
 from senor_octopus.types import Stream
 
 
-async def static(name: str, value: str) -> Stream:
+async def static(name: str, value: Any) -> Stream:
     """
     Generate static events.
 

@@ -75,6 +75,7 @@ async def test_micron_bolt_mini_2_gps(mocker: MockerFixture):
         "azimuth": 62.0,
         "battery": 77.0,
         "fix_time": datetime(2023, 4, 14, 19, 34, 20, tzinfo=timezone.utc),
+        "id": "352009117419957",
         "latitude": 38.313342,
         "longitude": -122.990623,
         "send_time": datetime(2023, 4, 14, 19, 34, 24, tzinfo=timezone.utc),
@@ -136,6 +137,7 @@ async def test_micron_bolt_mini_2_wifi(
     assert value == {
         "accuracy": 20,
         "battery": 77.0,
+        "id": "352009117419957",
         "latitude": 38.3130657,
         "longitude": -122.9903798,
         "source": "wifi",

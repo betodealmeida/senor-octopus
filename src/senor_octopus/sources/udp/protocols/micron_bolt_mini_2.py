@@ -100,6 +100,7 @@ class MicronBoltMini2UDPProtocol(asyncio.DatagramProtocol):
             if response.ok:
                 result = response.json()
                 value = {
+                    "id": parts[2],
                     "latitude": result["location"]["lat"],
                     "longitude": result["location"]["lng"],
                     "accuracy": result["accuracy"],
@@ -112,6 +113,7 @@ class MicronBoltMini2UDPProtocol(asyncio.DatagramProtocol):
         # GPS information
         elif parts[0] in {"+RESP:GTFRI", "+BUFF:GTFRI"}:
             value = {
+                "id": parts[2],
                 "accuracy": float(parts[7]),
                 "speed": float(parts[8]),
                 "azimuth": float(parts[9]),

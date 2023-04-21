@@ -117,6 +117,8 @@ lazy-object-proxy==1.9.0
     # via astroid
 markupsafe==2.1.2
     # via jinja2
+marshmallow==3.19.0
+    # via senor-octopus
 mccabe==0.7.0
     # via pylint
 multidict==6.0.4
@@ -128,6 +130,7 @@ nodeenv==1.7.0
 packaging==23.1
     # via
     #   build
+    #   marshmallow
     #   pytest
 paho-mqtt==1.6.1
     # via
@@ -175,7 +178,6 @@ pytest-mock==3.10.0
 python-dateutil==2.8.2
     # via
     #   freezegun
-    #   senor-octopus
     #   suntime
 python-geohash==0.8.5
     # via senor-octopus

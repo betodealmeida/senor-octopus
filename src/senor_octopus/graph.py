@@ -95,7 +95,11 @@ class Source(Node):
         super().__init__(node_name)
         self.plugin = plugin
         self.schedule = CronTab(schedule) if schedule else None
-        self.extra_kwargs = extra_kwargs
+        self.kwargs = (
+            self.plugin.configuration_schema.load(extra_kwargs)
+            if hasattr(self.plugin, "configuration_schema")
+            else extra_kwargs
+        )
 
     async def run(self) -> None:
         """
@@ -105,7 +109,7 @@ class Source(Node):
         down to children.
         """
         self._logger.info("Running")
-        downstream = self.plugin(**self.extra_kwargs)
+        downstream = self.plugin(**self.kwargs)
         async with itertools.tee(downstream, n=len(self.next)) as streams:
             for node, stream_copy in zip(self.next, streams):
                 logged_stream = log_events(
@@ -127,7 +131,11 @@ class Filter(Node):
     def __init__(self, node_name: str, plugin: FilterCallable, **extra_kwargs: Any):
         super().__init__(node_name)
         self.plugin = plugin
-        self.extra_kwargs = extra_kwargs
+        self.kwargs = (
+            self.plugin.configuration_schema.load(extra_kwargs)
+            if hasattr(self.plugin, "configuration_schema")
+            else extra_kwargs
+        )
 
     async def run(self, stream: Stream) -> None:
         """
@@ -137,7 +145,7 @@ class Filter(Node):
         potentially modifying and/or filtering them.
         """
         self._logger.info("Running")
-        downstream = self.plugin(stream, **self.extra_kwargs)
+        downstream = self.plugin(stream, **self.kwargs)
         async with itertools.tee(downstream, n=len(self.next)) as streams:
             for node, stream_copy in zip(self.next, streams):
                 logged_stream = log_events(
@@ -168,7 +176,11 @@ class Sink(Node):
         self.plugin = plugin
         self.throttle = Duration(throttle).to_seconds() if throttle else None
         self.batch = Duration(batch).to_seconds() if batch else None
-        self.extra_kwargs = extra_kwargs
+        self.kwargs = (
+            self.plugin.configuration_schema.load(extra_kwargs)
+            if hasattr(self.plugin, "configuration_schema")
+            else extra_kwargs
+        )
 
         self.last_run: Optional[float] = None
         self.queue: asyncio.Queue = asyncio.Queue()
@@ -209,7 +221,7 @@ class Sink(Node):
                 self.queue.put_nowait(event)
         else:
             self._logger.info("Processing events")
-            await self.plugin(stream, **self.extra_kwargs)  # type: ignore
+            await self.plugin(stream, **self.kwargs)  # type: ignore
 
     async def run_and_update_last_run(self, stream: Stream) -> Stream:
         """
@@ -269,7 +281,7 @@ class Sink(Node):
                 self.queue.task_done()
 
             self._logger.info("Processing batch")
-            await self.plugin(aiter_(stream), **self.extra_kwargs)  # type: ignore
+            await self.plugin(aiter_(stream), **self.kwargs)  # type: ignore
 
 
 def connected(config, source, target) -> bool:
@@ -293,7 +305,7 @@ def connected(config, source, target) -> bool:
 
 def build_dag(config: Dict[str, Any]) -> Set[Source]:
     """
-    Build the DAG from the YAML configuration.
+    Build the DAG from the configuration.
     """
     sections = set(config)
     for section in sections:

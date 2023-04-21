@@ -7,11 +7,12 @@ from __future__ import annotations
 import asyncio
 from asyncio.futures import Future
 from io import StringIO
-from typing import Any, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, TypeVar, Union
 
 import asciidag.graph
 import asciidag.node
 from asyncstdlib.builtins import anext as anext_
+from marshmallow import Schema
 
 from senor_octopus.graph import Node, Source
 from senor_octopus.types import Event, Stream
@@ -107,3 +108,18 @@ async def merge_streams(*streams: Stream) -> Stream:
                 del streams_next[stream]
                 continue
             yield event
+
+
+Plugin = TypeVar("Plugin", bound=Callable[..., Optional[Stream]])
+
+
+def configuration_schema(schema: Schema) -> Callable[[Plugin], Plugin]:
+    """
+    Attach a schema to a plugin.
+    """
+
+    def decorator(plugin: Plugin) -> Plugin:
+        plugin.configuration_schema = schema  # type: ignore
+        return plugin
+
+    return decorator

@@ -3,15 +3,60 @@ A source that reads data from an Awair Element monitor.
 """
 
 import logging
+from datetime import datetime, timezone
 
-import dateutil.parser
 import httpx
+from marshmallow import Schema, fields
 
+from senor_octopus.lib import configuration_schema
 from senor_octopus.types import Stream
 
 _logger = logging.getLogger(__name__)
 
 
+class AwairConfig(Schema):  # pylint: disable=too-few-public-methods
+    """
+    A source that reads air quality data from an Awair Element monitor.
+    """
+
+    access_token = fields.String(
+        required=True,
+        default=None,
+        title="Awair API access token",
+        description=(
+            "An Awair API access token. Can be obtained from "
+            "https://developer.getawair.com/console/access-token."
+        ),
+    )
+    device_id = fields.Integer(
+        required=True,
+        default=None,
+        title="Device ID",
+        description=(
+            "The ID of the device to read data from. To find the device ID: "
+            "`curl 'https://developer-apis.awair.is/v1/users/self/devices' "
+            "-H 'Authorization: Bearer example-token'`"
+        ),
+    )
+    device_type = fields.String(
+        required=False,
+        default="awair-element",
+        title="Device type",
+        description="The type of device to read data from.",
+    )
+    prefix = fields.String(
+        required=False,
+        default="hub.awair",
+        title="The prefix for events from this source",
+        description=(
+            "The prefix for events from this source. For example, if the "
+            "prefix is `awair` an event name `awair.score` will be emitted "
+            "for the air quality score."
+        ),
+    )
+
+
+@configuration_schema(AwairConfig())
 async def awair(
     access_token: str,
     device_id: int,
@@ -23,22 +68,6 @@ async def awair(
 
     This source will periodically retrieve air quality data from
     an Awair Element monitor.
-
-    Parameters
-    ----------
-    access_token
-        Awair API access token (https://developer.getawair.com/console/access-token)
-    device_id
-        Device ID
-    device_type
-        Device type
-    prefix
-        Prefix for events from this source
-
-    Yields
-    ------
-    Event
-        Events with data from sensors
     """
     _logger.info("Fetching air quality data")
     url = (
@@ -52,7 +81,10 @@ async def awair(
     _logger.debug("Received %s", payload)
 
     for row in payload["data"]:
-        timestamp = dateutil.parser.parse(row["timestamp"])
+        timestamp = datetime.strptime(
+            row["timestamp"],
+            "%Y-%m-%dT%H:%M:%S.%fZ",
+        ).replace(tzinfo=timezone.utc)
         yield {
             "timestamp": timestamp,
             "name": f"{prefix}.score",

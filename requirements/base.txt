@@ -15,6 +15,10 @@ crontab==1.0.1
     # via senor-octopus
 durations==0.3.3
     # via senor-octopus
+marshmallow==3.19.0
+    # via senor-octopus
+packaging==23.1
+    # via marshmallow
 pyyaml==6.0
     # via senor-octopus
 typing-extensions==4.5.0

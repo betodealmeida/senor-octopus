@@ -5,17 +5,32 @@ Helper functions for Señor Octopus.
 from __future__ import annotations
 
 import asyncio
+import inspect
 from asyncio.futures import Future
 from io import StringIO
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    Protocol,
+    Set,
+    Tuple,
+    TypeVar,
+    Union,
+)
 
 import asciidag.graph
 import asciidag.node
 from asyncstdlib.builtins import anext as anext_
-from marshmallow import Schema
+from marshmallow import Schema, fields
 
-from senor_octopus.graph import Node, Source
 from senor_octopus.types import Event, Stream
+
+if TYPE_CHECKING:  # pragma: no cover
+    from senor_octopus.graph import Node, Source
 
 
 def flatten(
@@ -39,7 +54,7 @@ def flatten(
     return dict(items)
 
 
-def render_dag(dag: Set[Source], **kwargs: Any) -> str:
+def render_dag(dag: Set["Source"], **kwargs: Any) -> str:
     """
     Render a DAG as an ASCII graph.
     """
@@ -57,7 +72,7 @@ def render_dag(dag: Set[Source], **kwargs: Any) -> str:
 
 
 def build_asciidag(
-    node: Node,
+    node: "Node",
     asciidag_nodes: Dict[str, asciidag.node.Node],
 ) -> asciidag.node.Node:
     """
@@ -113,6 +128,14 @@ async def merge_streams(*streams: Stream) -> Stream:
 Plugin = TypeVar("Plugin", bound=Callable[..., Optional[Stream]])
 
 
+class PluginWithSchema(Protocol):
+    """
+    A plugin with a configuration schema.
+    """
+
+    configuration_schema: Schema
+
+
 def configuration_schema(schema: Schema) -> Callable[[Plugin], Plugin]:
     """
     Attach a schema to a plugin.
@@ -123,3 +146,33 @@ def configuration_schema(schema: Schema) -> Callable[[Plugin], Plugin]:
         return plugin
 
     return decorator
+
+
+def build_marshmallow_schema(function: Plugin) -> Schema:
+    """
+    Build a Marshmallow schema from a function signature.
+    """
+    type_map = {
+        str: fields.String,
+        int: fields.Integer,
+    }
+
+    signature = inspect.signature(function)
+    attributes = {}
+    for name, parameter in signature.parameters.items():
+        if name == "stream":
+            continue
+
+        if parameter.annotation not in type_map:
+            raise TypeError(
+                f"Unsupported type {parameter.annotation} for parameter {name}",
+            )
+        kwargs = {
+            "title": name,
+            "required": parameter.default is inspect.Parameter.empty,
+        }
+        if parameter.default is not inspect.Parameter.empty:
+            kwargs["default"] = parameter.default
+        attributes[name] = type_map[parameter.annotation](**kwargs)
+
+    return Schema.from_dict(attributes)()

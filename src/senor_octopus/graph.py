@@ -13,6 +13,7 @@ from durations import Duration
 from pkg_resources import iter_entry_points
 
 from senor_octopus.exceptions import InvalidConfigurationException
+from senor_octopus.lib import build_marshmallow_schema
 from senor_octopus.types import (
     Event,
     FilterCallable,
@@ -90,16 +91,19 @@ class Source(Node):
         node_name: str,
         plugin: SourceCallable,
         schedule: Optional[str] = None,
-        **extra_kwargs: Any,
+        **kwargs: Any,
     ):
         super().__init__(node_name)
+
+        schema = getattr(
+            plugin,
+            "configuration_schema",
+            build_marshmallow_schema(plugin),
+        )
+
         self.plugin = plugin
         self.schedule = CronTab(schedule) if schedule else None
-        self.kwargs = (
-            self.plugin.configuration_schema.load(extra_kwargs)
-            if hasattr(self.plugin, "configuration_schema")
-            else extra_kwargs
-        )
+        self.kwargs = schema.load(kwargs)
 
     async def run(self) -> None:
         """
@@ -128,14 +132,17 @@ class Filter(Node):
     to their children, modified or filtered.
     """
 
-    def __init__(self, node_name: str, plugin: FilterCallable, **extra_kwargs: Any):
+    def __init__(self, node_name: str, plugin: FilterCallable, **kwargs: Any):
         super().__init__(node_name)
-        self.plugin = plugin
-        self.kwargs = (
-            self.plugin.configuration_schema.load(extra_kwargs)
-            if hasattr(self.plugin, "configuration_schema")
-            else extra_kwargs
+
+        schema = getattr(
+            plugin,
+            "configuration_schema",
+            build_marshmallow_schema(plugin),
         )
+
+        self.plugin = plugin
+        self.kwargs = schema.load(kwargs)
 
     async def run(self, stream: Stream) -> None:
         """
@@ -170,17 +177,20 @@ class Sink(Node):
         plugin: SinkCallable,
         throttle: Optional[str] = None,
         batch: Optional[str] = None,
-        **extra_kwargs: Any,
+        **kwargs: Any,
     ):
         super().__init__(node_name)
+
+        schema = getattr(
+            plugin,
+            "configuration_schema",
+            build_marshmallow_schema(plugin),
+        )
+
         self.plugin = plugin
         self.throttle = Duration(throttle).to_seconds() if throttle else None
         self.batch = Duration(batch).to_seconds() if batch else None
-        self.kwargs = (
-            self.plugin.configuration_schema.load(extra_kwargs)
-            if hasattr(self.plugin, "configuration_schema")
-            else extra_kwargs
-        )
+        self.kwargs = schema.load(kwargs)
 
         self.last_run: Optional[float] = None
         self.queue: asyncio.Queue = asyncio.Queue()

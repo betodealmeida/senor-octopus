@@ -8,9 +8,16 @@ import random
 import aiotools
 import pytest
 import yaml
+from marshmallow_jsonschema import JSONSchema
 
 from senor_octopus.graph import build_dag
-from senor_octopus.lib import flatten, merge_streams, render_dag
+from senor_octopus.lib import (
+    build_marshmallow_schema,
+    flatten,
+    merge_streams,
+    render_dag,
+)
+from senor_octopus.sources.awair import awair
 
 
 def test_flatten() -> None:
@@ -114,3 +121,94 @@ async def test_merge_streams() -> None:
         ("stream1", 0.22321073814882275),
         ("stream2", 0.7364712141640124),
     ]
+
+
+def test_build_marshmallow_schema() -> None:
+    """
+    Test the ``build_marshmallow_schema`` function.
+    """
+    json_schema = JSONSchema()
+    schema = build_marshmallow_schema(awair)
+    assert json_schema.dump(schema) == {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+            "GeneratedSchema": {
+                "type": "object",
+                "properties": {
+                    "access_token": {"title": "access_token", "type": "string"},
+                    "device_id": {"title": "device_id", "type": "integer"},
+                    "device_type": {
+                        "title": "device_type",
+                        "type": "string",
+                        "default": "awair-element",
+                    },
+                    "prefix": {
+                        "title": "prefix",
+                        "type": "string",
+                        "default": "hub.awair",
+                    },
+                },
+                "required": ["access_token", "device_id"],
+                "additionalProperties": False,
+            },
+        },
+        "$ref": "#/definitions/GeneratedSchema",
+    }
+
+    json_schema = JSONSchema()
+    assert json_schema.dump(awair.configuration_schema) == {  # type: ignore
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "definitions": {
+            "AwairConfig": {
+                "required": ["access_token", "device_id"],
+                "properties": {
+                    "access_token": {
+                        "title": "Awair API access token",
+                        "type": "string",
+                        "default": None,
+                        "description": (
+                            "An Awair API access token. Can be obtained from "
+                            "https://developer.getawair.com/console/access-token."
+                        ),
+                    },
+                    "device_id": {
+                        "title": "Device ID",
+                        "type": "integer",
+                        "default": None,
+                        "description": (
+                            "The ID of the device to read data from. To find "
+                            "the device ID: `curl "
+                            "'https://developer-apis.awair.is/v1/users/self/devices' "
+                            "-H 'Authorization: Bearer example-token'`"
+                        ),
+                    },
+                    "device_type": {
+                        "title": "Device type",
+                        "type": "string",
+                        "default": "awair-element",
+                        "description": "The type of device to read data from.",
+                    },
+                    "prefix": {
+                        "title": "The prefix for events from this source",
+                        "type": "string",
+                        "default": "hub.awair",
+                        "description": (
+                            "The prefix for events from this source. For example, if "
+                            "the prefix is `awair` an event name `awair.score` will "
+                            "be emitted for the air quality score."
+                        ),
+                    },
+                },
+                "type": "object",
+                "additionalProperties": False,
+            },
+        },
+        "$ref": "#/definitions/AwairConfig",
+    }
+
+    def some_func(arg: object) -> object:
+        return arg
+
+    with pytest.raises(TypeError) as excinfo:
+        build_marshmallow_schema(some_func)  # type: ignore
+    assert str(excinfo.value) == "Unsupported type <class 'object'> for parameter a"

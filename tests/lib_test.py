@@ -211,4 +211,4 @@ def test_build_marshmallow_schema() -> None:
 
     with pytest.raises(TypeError) as excinfo:
         build_marshmallow_schema(some_func)  # type: ignore
-    assert str(excinfo.value) == "Unsupported type <class 'object'> for parameter a"
+    assert str(excinfo.value) == "Unsupported type <class 'object'> for parameter arg"

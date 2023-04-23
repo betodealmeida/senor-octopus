@@ -15,7 +15,6 @@ from typing import (
     Dict,
     List,
     Optional,
-    Protocol,
     Set,
     Tuple,
     TypeVar,
@@ -126,14 +125,6 @@ async def merge_streams(*streams: Stream) -> Stream:
 
 
 Plugin = TypeVar("Plugin", bound=Callable[..., Optional[Stream]])
-
-
-class PluginWithSchema(Protocol):
-    """
-    A plugin with a configuration schema.
-    """
-
-    configuration_schema: Schema
 
 
 def configuration_schema(schema: Schema) -> Callable[[Plugin], Plugin]:

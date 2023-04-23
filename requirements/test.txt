@@ -118,6 +118,10 @@ lazy-object-proxy==1.9.0
 markupsafe==2.1.2
     # via jinja2
 marshmallow==3.19.0
+    # via
+    #   marshmallow-jsonschema
+    #   senor-octopus
+marshmallow-jsonschema==0.13.0
     # via senor-octopus
 mccabe==0.7.0
     # via pylint

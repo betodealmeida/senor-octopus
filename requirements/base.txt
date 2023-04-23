@@ -16,6 +16,10 @@ crontab==1.0.1
 durations==0.3.3
     # via senor-octopus
 marshmallow==3.19.0
+    # via
+    #   marshmallow-jsonschema
+    #   senor-octopus
+marshmallow-jsonschema==0.13.0
     # via senor-octopus
 packaging==23.1
     # via marshmallow

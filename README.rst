@@ -331,6 +331,7 @@ Filters
 
 The existing filters are very similar, the main difference being how you configure them:
 
+- `filter.combine <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/combine.py>`_: Aggregate multiple events into a single one.
 - `filter.format <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/format.py>`_: Format an event stream based using Python string formatting.
 - `filter.jinja <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/jinja.py>`_: Apply a Jinja2 template to events.
 - `filter.jsonpath <https://github.com/betodealmeida/senor-octopus/blob/main/src/senor_octopus/filters/jpath.py>`_: Filter event stream based on a JSON path.
